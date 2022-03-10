@@ -36,6 +36,10 @@ struct Feature;
 
 struct Frame {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
+  typedef std::shared_ptr<Frame> Ptr;
+
   Frame() {}
 
   Frame(uint64_t id, double time_stamp, const Sophus::SE3d &pose,
@@ -56,27 +60,18 @@ struct Frame {
   static std::shared_ptr<Frame> CreateFrame();
 
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
-  typedef std::shared_ptr<Frame> Ptr;
-
   uint64_t id_{0};
-
   uint64_t keyframe_id_{0};
-
   bool is_keyframe_{false};
-
   double time_stamp_;
 
   Sophus::SE3d pose_;
-
   std::mutex pose_mutex_;
 
   cv::Mat left_img_, right_img_;
 
   // extracted features in left image
   std::vector<std::shared_ptr<Feature>> features_left_;
-
   // corresponding features in right image, set to nullptr if no corresponding
   std::vector<std::shared_ptr<Feature>> features_right_;
 };
