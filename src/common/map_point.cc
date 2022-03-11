@@ -29,6 +29,9 @@ MapPoint::Ptr MapPoint::CreateNewMappoint() {
   return new_mappoint;
 }
 
+/**
+ * current map point observed_times will decrease
+ * */
 void MapPoint::RemoveObservation(std::shared_ptr<Feature> feat) {
   std::unique_lock<std::mutex> lck(data_mutex_);
   for (auto iter = observations_.begin(); iter != observations_.end(); iter++) {
