@@ -5,6 +5,8 @@
 .idea/
 .kdev4/
 build/
+lib/
+bin/
 compile_commands.json
 *.pth
 *.kdev4
