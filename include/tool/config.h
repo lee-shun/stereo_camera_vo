@@ -13,8 +13,8 @@
  *
  *******************************************************************************/
 
-#ifndef INCLUDE_TOOL_CONFIG_HPP_
-#define INCLUDE_TOOL_CONFIG_HPP_
+#ifndef INCLUDE_TOOL_CONFIG_H_
+#define INCLUDE_TOOL_CONFIG_H_
 
 #include <memory>
 #include <string>
@@ -45,4 +45,4 @@ class Config {
 }  // namespace tool
 }  // namespace stereo_camera_vo
 
-#endif  // INCLUDE_TOOL_CONFIG_HPP_
+#endif  // INCLUDE_TOOL_CONFIG_H_
