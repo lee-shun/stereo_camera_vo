@@ -72,7 +72,8 @@ class Frontend {
   bool Reset();
 
   /**
-   * Track with last frame
+   * Track with last frame, get the keypoints in current frame.
+   * use LK flow to estimate points in the current image
    * @return num of tracked points
    */
   int TrackLastFrame();
@@ -87,7 +88,7 @@ class Frontend {
    * set current frame as a keyframe and insert it into backend
    * @return true if success
    */
-  bool InsertKeyframe();
+  bool UpdateMapWithFrame();
 
   /**
    * Try init the frontend with stereo images saved in current_frame_
@@ -100,7 +101,7 @@ class Frontend {
    * keypoints will be saved in current_frame_
    * @return the number of new features
    */
-  int DetectFeatures();
+  int DetectNewFeatures();
 
   /**
    * Find the corresponding features in right image of current_frame_
@@ -138,7 +139,7 @@ class Frontend {
 
   Sophus::SE3d relative_motion_;
 
-  uint16_t tracking_inliers_{0};  // inliers, used for testing new keyframes
+  uint16_t num_tracking_inliers_{0};  // inliers, used for testing new keyframes
 
   // params
   int num_features_{200};

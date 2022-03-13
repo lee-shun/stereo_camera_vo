@@ -1,6 +1,11 @@
-add_library(${PROJECT_NAME}_tool
-        config.cc
-        viewer.cc
-        dataset.cc
-        algorithm.cc
-        )
+add_library(
+  ${PROJECT_NAME}_tool
+  config.cc
+  viewer.cc
+  dataset.cc
+  algorithm.cc
+)
+target_link_libraries(
+  ${PROJECT_NAME}_tool
+  ${THIRD_PARTY_LIBS}
+)
