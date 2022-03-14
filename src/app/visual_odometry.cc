@@ -14,6 +14,7 @@
  *******************************************************************************/
 
 #include "app/visual_odometry.h"
+#include <unistd.h>
 #include "tool/config.h"
 #include "tool/print_ctrl_macro.h"
 
@@ -60,6 +61,7 @@ void VisualOdometry::Run() {
     if (Step() == false) {
       break;
     }
+    usleep(2000);
   }
 
   backend_->Stop();
