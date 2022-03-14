@@ -50,7 +50,6 @@ class VisualOdometry {
    */
   bool Step();
 
-  /// 获取前端状态
   module::FrontendStatus GetFrontendStatus() const {
     return frontend_->GetStatus();
   }
