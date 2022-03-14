@@ -28,7 +28,7 @@ bool Config::SetParameterFile(const std::string &filename) {
     config_->file_.release();
     return false;
   }
-
+  PRINT_INFO("parameter file: %s read successfully!", filename.c_str());
   return true;
 }
 

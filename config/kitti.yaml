@@ -1,1 +1,5 @@
-dataset_dir: 
+%YAML:1.0
+# data
+# the tum dataset directory, change it to yours! 
+# dataset_dir: /media/xiang/Data/Dataset/Kitti/dataset/sequences/00
+dataset_dir: /media/ls/Sony32/02

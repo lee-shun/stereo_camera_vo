@@ -38,7 +38,7 @@ class Config {
   // access the parameter values
   template <typename T>
   static T Get(const std::string &key) {
-    return T(Config::config_->file_[key]);
+    return static_cast<T>(Config::config_->file_[key]);
   }
 };
 
