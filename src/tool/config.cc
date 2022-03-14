@@ -14,6 +14,7 @@
  *******************************************************************************/
 
 #include "tool/config.h"
+#include <iostream>
 #include "tool/print_ctrl_macro.h"
 
 namespace stereo_camera_vo {
@@ -21,7 +22,8 @@ namespace tool {
 
 bool Config::SetParameterFile(const std::string &filename) {
   if (config_ == nullptr) config_ = std::shared_ptr<Config>(new Config);
-  config_->file_ = cv::FileStorage(filename.c_str(), cv::FileStorage::READ);
+
+  config_->file_.open(filename, cv::FileStorage::READ);
 
   if (config_->file_.isOpened() == false) {
     PRINT_ERROR("parameter file: %s does NOT exist!", filename.c_str());
@@ -29,6 +31,7 @@ bool Config::SetParameterFile(const std::string &filename) {
     return false;
   }
   PRINT_INFO("parameter file: %s read successfully!", filename.c_str());
+
   return true;
 }
 
