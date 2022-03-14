@@ -223,12 +223,12 @@ bool Frontend::UpdateMapWithFrame() {
   PRINT_INFO("set frame id: %lu to keyframe keyframe_id: %lu",
              current_frame_->id_, current_frame_->keyframe_id_);
 
+  SetObservationsForKeyFrame();
+
   // re-detect and add more map points for a keyframe if possible
-  // TODO(lee-shun): set the observations after new map points createed.
   DetectNewFeatures();
   FindFeaturesInRight();
   TriangulateNewPoints();
-  SetObservationsForKeyFrame();
 
   map_->InsertKeyFrame(current_frame_);
   backend_->UpdateMap();

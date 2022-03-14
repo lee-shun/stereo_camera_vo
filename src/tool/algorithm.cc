@@ -40,10 +40,11 @@ bool Triangulation(const std::vector<Sophus::SE3d> &poses,
   auto svd = A.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV);
   pt_world = (svd.matrixV().col(3) / svd.matrixV()(3, 3)).head<3>();
 
-  // bad solution
   if (svd.singularValues()[3] / svd.singularValues()[2] < 1e-2) {
     return true;
   }
+
+  // bad solution
   return false;
 }
 
