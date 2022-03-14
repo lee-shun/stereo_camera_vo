@@ -29,6 +29,8 @@
 namespace stereo_camera_vo {
 namespace module {
 
+// TODO(lee-shun): this backend has memory leak problems???
+
 Backend::Backend() {
   backend_running_.store(true);
   backend_thread_ = std::thread(std::bind(&Backend::BackendLoop, this));
@@ -68,6 +70,9 @@ void Backend::Optimize(common::Map::KeyframesType &keyframes,
   g2o::SparseOptimizer optimizer;
   optimizer.setAlgorithm(solver);
 
+  /**
+   * camera pose bind with keyframe_id
+   * */
   std::map<uint64_t, VertexPose *> vertices;
   uint64_t max_kf_id = 0;
   for (auto &keyframe : keyframes) {
@@ -89,21 +94,25 @@ void Backend::Optimize(common::Map::KeyframesType &keyframes,
   Sophus::SE3d left_ext = cam_left_->pose();
   Sophus::SE3d right_ext = cam_right_->pose();
 
-  // edges
   int index = 1;
   double chi2_th = 5.991;
+  // each edge is each observation == each feature.
   std::map<EdgeProjection *, common::Feature::Ptr> edges_and_features;
 
   for (auto &landmark : landmarks) {
     if (landmark.second->is_outlier_) continue;
+
     uint64_t landmark_id = landmark.second->id_;
     auto observations = landmark.second->GetObs();
+
+    /**
+     * each observation to a landmark generates an edge
+     * */
     for (auto &obs : observations) {
       if (obs.lock() == nullptr) continue;
       auto feat = obs.lock();
       if (feat->is_outlier_ || feat->frame_.lock() == nullptr) continue;
 
-      auto frame = feat->frame_.lock();
       EdgeProjection *edge = nullptr;
       if (feat->is_on_left_image_) {
         edge = new EdgeProjection(K, left_ext);
@@ -122,6 +131,7 @@ void Backend::Optimize(common::Map::KeyframesType &keyframes,
       }
 
       edge->setId(index);
+      auto frame = feat->frame_.lock();
       edge->setVertex(0, vertices.at(frame->keyframe_id_));    // pose
       edge->setVertex(1, vertices_landmarks.at(landmark_id));  // landmark
       edge->setMeasurement(tool::ToVec2(feat->position_.pt));
@@ -129,6 +139,7 @@ void Backend::Optimize(common::Map::KeyframesType &keyframes,
       auto rk = new g2o::RobustKernelHuber();
       rk->setDelta(chi2_th);
       edge->setRobustKernel(rk);
+
       edges_and_features.insert({edge, feat});
 
       optimizer.addEdge(edge);
