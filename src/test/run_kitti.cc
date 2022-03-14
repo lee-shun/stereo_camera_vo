@@ -16,7 +16,7 @@
 #include "app/visual_odometry.h"
 
 int main(int argc, char **argv) {
-  std::string config_file = "hello";
+  std::string config_file = "./config/kitti.yaml";
   stereo_camera_vo::app::VisualOdometry::Ptr vo(
       new stereo_camera_vo::app::VisualOdometry(config_file));
   assert(vo->Init() == true);
