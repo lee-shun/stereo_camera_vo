@@ -409,7 +409,7 @@ bool Frontend::BuildInitMap() {
 bool Frontend::Reset() {
   PRINT_WARN("Reset!");
   RestMap();
-  // ResetBackend();
+  ResetBackend();
   status_ = FrontendStatus::INITING;
   return true;
 }

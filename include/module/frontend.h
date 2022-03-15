@@ -49,7 +49,10 @@ class Frontend {
   void SetBackend(std::shared_ptr<module::Backend> backend) {
     backend_ = backend;
   }
-  void ResetBackend() { backend_ = module::Backend::Ptr(new module::Backend); }
+  void ResetBackend() {
+    backend_->Stop();
+    backend_ = module::Backend::Ptr(new module::Backend);
+  }
 
   void SetViewer(std::shared_ptr<tool::Viewer> viewer) { viewer_ = viewer; }
   void ResetViewer() { viewer_ = tool::Viewer::Ptr(new tool::Viewer); }
