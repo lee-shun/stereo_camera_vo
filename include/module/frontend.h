@@ -50,7 +50,7 @@ class Frontend {
     backend_ = backend;
   }
   void ResetBackend() {
-    backend_->Stop();
+    backend_->Destory();
     backend_ = module::Backend::Ptr(new module::Backend);
   }
 

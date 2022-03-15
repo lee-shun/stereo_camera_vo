@@ -43,6 +43,12 @@ void Backend::Stop() {
   backend_thread_.join();
 }
 
+void Backend::Destory() {
+  backend_running_.store(false);
+  map_update_.notify_one();
+  backend_thread_.detach();
+}
+
 void Backend::BackendLoop() {
   while (backend_running_.load()) {
     std::unique_lock<std::mutex> lock(data_mutex_);

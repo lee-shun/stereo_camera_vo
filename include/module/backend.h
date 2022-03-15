@@ -55,6 +55,8 @@ class Backend {
 
   void Stop();
 
+  void Destory();
+
  private:
   void BackendLoop();
 
