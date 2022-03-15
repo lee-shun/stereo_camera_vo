@@ -14,8 +14,6 @@
  *******************************************************************************/
 
 #include "module/backend.h"
-#include "common/feature.h"
-#include "module/g2o_types.h"
 #include "tool/algorithm.h"
 #include "tool/print_ctrl_macro.h"
 
@@ -23,8 +21,6 @@
 #include <g2o/solvers/csparse/linear_solver_csparse.h>
 #include <g2o/core/optimization_algorithm_levenberg.h>
 #include <g2o/core/robust_kernel_impl.h>
-
-#include <map>
 
 namespace stereo_camera_vo {
 namespace module {
@@ -71,43 +67,60 @@ void Backend::Optimize(common::Map::KeyframesType &keyframes,
   optimizer.setAlgorithm(solver);
 
   /**
-   * camera pose bind with keyframe_id
+   * Step: camera pose vertices bind with keyframe_id
    * */
-  std::map<uint64_t, VertexPose *> vertices;
+
+  std::map<uint64_t, VertexPose *> veretx_pose_set;
   uint64_t max_kf_id = 0;
   for (auto &keyframe : keyframes) {
     auto kf = keyframe.second;
-    VertexPose *vertex_pose = new VertexPose();  // camera vertex_pose
+    VertexPose *vertex_pose = new VertexPose();
+
     vertex_pose->setId(kf->keyframe_id_);
     vertex_pose->setEstimate(kf->Pose());
     optimizer.addVertex(vertex_pose);
+
     if (kf->keyframe_id_ > max_kf_id) {
       max_kf_id = kf->keyframe_id_;
     }
 
-    vertices.insert({kf->keyframe_id_, vertex_pose});
+    veretx_pose_set.insert({kf->keyframe_id_, vertex_pose});
   }
 
-  std::map<uint64_t, VertexXYZ *> vertices_landmarks;
+  /**
+   * Step: landmark vertex and edges (observation (features) for each landmark)
+   * */
+
+  // each edge is each observation == each feature.
+  std::map<uint64_t, VertexXYZ *> vertex_ldmk_set;
+  std::map<EdgeProjection *, common::Feature::Ptr> edges_and_features;
 
   Eigen::Matrix3d K = cam_left_->K();
   Sophus::SE3d left_ext = cam_left_->pose();
   Sophus::SE3d right_ext = cam_right_->pose();
 
-  int index = 1;
   double chi2_th = 5.991;
-  // each edge is each observation == each feature.
-  std::map<EdgeProjection *, common::Feature::Ptr> edges_and_features;
+  int obs_index = 1;
 
-  for (auto &landmark : landmarks) {
-    if (landmark.second->is_outlier_) continue;
+  for (auto &ldmk : landmarks) {
+    if (ldmk.second->is_outlier_) continue;
 
-    uint64_t landmark_id = landmark.second->id_;
-    auto observations = landmark.second->GetObs();
+    // PRINT_DEBUG("ldmk.first == ldmk.second->id_ ? : %d",
+    //             (ldmk.first == ldmk.second->id_));
+    uint64_t landmark_id = ldmk.second->id_;
+    auto observations = ldmk.second->GetObs();
 
-    /**
-     * each observation to a landmark generates an edge
-     * */
+    // add position vertex for each landmark
+    if (vertex_ldmk_set.find(landmark_id) == vertex_ldmk_set.end()) {
+      VertexXYZ *v = new VertexXYZ;
+      v->setEstimate(ldmk.second->Pos());
+      v->setId(landmark_id + max_kf_id + 1);
+      v->setMarginalized(true);
+      vertex_ldmk_set.insert({landmark_id, v});
+      optimizer.addVertex(v);
+    }
+
+    // add observations(edges) for each landmark and frame pose
     for (auto &obs : observations) {
       if (obs.lock() == nullptr) continue;
       auto feat = obs.lock();
@@ -120,31 +133,18 @@ void Backend::Optimize(common::Map::KeyframesType &keyframes,
         edge = new EdgeProjection(K, right_ext);
       }
 
-      // add xyz vertices for each landmark
-      if (vertices_landmarks.find(landmark_id) == vertices_landmarks.end()) {
-        VertexXYZ *v = new VertexXYZ;
-        v->setEstimate(landmark.second->Pos());
-        v->setId(landmark_id + max_kf_id + 1);
-        v->setMarginalized(true);
-        vertices_landmarks.insert({landmark_id, v});
-        optimizer.addVertex(v);
-      }
-
-      edge->setId(index);
+      edge->setId(obs_index);
       auto frame = feat->frame_.lock();
-      edge->setVertex(0, vertices.at(frame->keyframe_id_));    // pose
-      edge->setVertex(1, vertices_landmarks.at(landmark_id));  // landmark
+      edge->setVertex(0, veretx_pose_set.at(frame->keyframe_id_));  // pose
+      edge->setVertex(1, vertex_ldmk_set.at(landmark_id));          // landmark
       edge->setMeasurement(tool::ToVec2(feat->position_.pt));
       edge->setInformation(Eigen::Matrix2d::Identity());
       auto rk = new g2o::RobustKernelHuber();
       rk->setDelta(chi2_th);
       edge->setRobustKernel(rk);
-
       edges_and_features.insert({edge, feat});
-
       optimizer.addEdge(edge);
-
-      index++;
+      obs_index++;
     }
   }
 
@@ -152,28 +152,7 @@ void Backend::Optimize(common::Map::KeyframesType &keyframes,
   optimizer.initializeOptimization();
   optimizer.optimize(10);
 
-  int cnt_outlier = 0, cnt_inlier = 0;
-  int iteration = 0;
-  while (iteration < 5) {
-    cnt_outlier = 0;
-    cnt_inlier = 0;
-    // determine if we want to adjust the outlier threshold
-    for (auto &ef : edges_and_features) {
-      if (ef.first->chi2() > chi2_th) {
-        cnt_outlier++;
-      } else {
-        cnt_inlier++;
-      }
-    }
-    double inlier_ratio =
-        cnt_inlier / static_cast<double>(cnt_inlier + cnt_outlier);
-    if (inlier_ratio > 0.5) {
-      break;
-    } else {
-      chi2_th *= 2;
-      iteration++;
-    }
-  }
+  UpdateChiTh(edges_and_features, &chi2_th);
 
   for (auto &ef : edges_and_features) {
     if (ef.first->chi2() > chi2_th) {
@@ -185,16 +164,45 @@ void Backend::Optimize(common::Map::KeyframesType &keyframes,
     }
   }
 
-  PRINT_INFO("outlier/Inlier in pose estimating: %d/%d", cnt_outlier,
-             cnt_inlier);
-
   // Set pose and lanrmark position
-  for (auto &v : vertices) {
+  for (auto &v : veretx_pose_set) {
     keyframes.at(v.first)->SetPose(v.second->estimate());
   }
-  for (auto &v : vertices_landmarks) {
+  for (auto &v : vertex_ldmk_set) {
     landmarks.at(v.first)->SetPos(v.second->estimate());
   }
 }
+
+void Backend::UpdateChiTh(
+    const std::map<EdgeProjection *, common::Feature::Ptr> &edges_and_features,
+    double *chi2_th) {
+  int cnt_outlier = 0, cnt_inlier = 0;
+  int iteration = 0;
+
+  while (iteration < 5) {
+    cnt_outlier = 0;
+    cnt_inlier = 0;
+    // determine if we want to adjust the outlier threshold
+    for (auto &ef : edges_and_features) {
+      if (ef.first->chi2() > *chi2_th) {
+        cnt_outlier++;
+      } else {
+        cnt_inlier++;
+      }
+    }
+    double inlier_ratio =
+        cnt_inlier / static_cast<double>(cnt_inlier + cnt_outlier);
+    if (inlier_ratio > 0.5) {
+      break;
+    } else {
+      (*chi2_th) *= 2;
+      iteration++;
+    }
+  }
+
+  PRINT_INFO("outlier/inlier in pose estimating: %d/%d", cnt_outlier,
+             cnt_inlier);
+}
+
 }  // namespace module
 }  // namespace stereo_camera_vo

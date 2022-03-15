@@ -62,7 +62,7 @@ void VisualOdometry::Run() {
     if (Step() == false) {
       break;
     }
-    sleep(10);
+    // sleep(5);
   }
 
   backend_->Stop();

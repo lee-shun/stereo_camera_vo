@@ -18,12 +18,16 @@
 
 #include "common/camera.h"
 #include "common/map.h"
+#include "module/g2o_types.h"
+#include "common/feature.h"
+
 #include <Eigen/Core>
 
 #include <memory>
 #include <thread>
 #include <condition_variable>
 #include <atomic>
+#include <map>
 
 namespace stereo_camera_vo {
 namespace module {
@@ -54,6 +58,9 @@ class Backend {
  private:
   void BackendLoop();
 
+  void UpdateChiTh(const std::map<EdgeProjection*, common::Feature::Ptr>&
+                       edges_and_features, double* chi2_th);
+
   void Optimize(common::Map::KeyframesType& keyframes,
                 common::Map::LandmarksType& landmarks);
 
@@ -64,7 +71,7 @@ class Backend {
   std::condition_variable map_update_;
   std::atomic<bool> backend_running_;
 
-  common::Camera::Ptr cam_left_ = nullptr, cam_right_ = nullptr;
+  common::Camera::Ptr cam_left_{nullptr}, cam_right_{nullptr};
 };
 }  // namespace module
 }  // namespace stereo_camera_vo
