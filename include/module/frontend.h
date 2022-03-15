@@ -44,12 +44,15 @@ class Frontend {
   bool AddFrame(common::Frame::Ptr frame);
 
   void SetMap(common::Map::Ptr map) { map_ = map; }
+  void RestMap() { map_ = common::Map::Ptr(new common::Map); }
 
   void SetBackend(std::shared_ptr<module::Backend> backend) {
     backend_ = backend;
   }
+  void ResetBackend() { backend_ = module::Backend::Ptr(new module::Backend); }
 
   void SetViewer(std::shared_ptr<tool::Viewer> viewer) { viewer_ = viewer; }
+  void ResetViewer() { viewer_ = tool::Viewer::Ptr(new tool::Viewer); }
 
   void SetCameras(common::Camera::Ptr left, common::Camera::Ptr right) {
     camera_left_ = left;

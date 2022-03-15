@@ -406,9 +406,11 @@ bool Frontend::BuildInitMap() {
   return true;
 }
 
-// TODO(lee-shun): implement it...
 bool Frontend::Reset() {
-  PRINT_WARN("Reset method is not implemented!");
+  PRINT_WARN("Reset!");
+  RestMap();
+  ResetBackend();
+  status_ = FrontendStatus::INITING;
   return true;
 }
 }  // namespace module
