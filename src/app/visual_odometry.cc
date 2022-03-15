@@ -14,9 +14,10 @@
  *******************************************************************************/
 
 #include "app/visual_odometry.h"
-#include <unistd.h>
 #include "tool/config.h"
 #include "tool/print_ctrl_macro.h"
+
+#include <unistd.h>
 
 namespace stereo_camera_vo {
 namespace app {
@@ -61,7 +62,7 @@ void VisualOdometry::Run() {
     if (Step() == false) {
       break;
     }
-    usleep(2000);
+    sleep(10);
   }
 
   backend_->Stop();
