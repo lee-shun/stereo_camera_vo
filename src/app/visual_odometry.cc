@@ -38,20 +38,8 @@ bool VisualOdometry::Init() {
   }
 
   // create components and links
-  frontend_ = module::Frontend::Ptr(new module::Frontend);
-  backend_ = module::Backend::Ptr(new module::Backend);
-  map_ = common::Map::Ptr(new common::Map);
-  viewer_ = tool::Viewer::Ptr(new tool::Viewer);
-
-  frontend_->SetBackend(backend_);
-  frontend_->SetMap(map_);
-  frontend_->SetViewer(viewer_);
-  frontend_->SetCameras(dataset_->GetCamera(0), dataset_->GetCamera(1));
-
-  backend_->SetMap(map_);
-  backend_->SetCameras(dataset_->GetCamera(0), dataset_->GetCamera(1));
-
-  viewer_->SetMap(map_);
+  frontend_ = module::Frontend::Ptr(
+      new module::Frontend(dataset_->GetCamera(0), dataset_->GetCamera(1)));
 
   return true;
 }
@@ -64,10 +52,7 @@ void VisualOdometry::Run() {
     }
     // sleep(5);
   }
-
-  backend_->Stop();
-  viewer_->Close();
-
+  frontend_->Stop();
   PRINT_INFO("VO exit!");
 }
 

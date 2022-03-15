@@ -17,7 +17,6 @@
 #define INCLUDE_APP_VISUAL_ODOMETRY_H_
 
 #include "module/frontend.h"
-#include "module/backend.h"
 #include "tool/dataset.h"
 #include <Eigen/Core>
 
@@ -59,9 +58,6 @@ class VisualOdometry {
   std::string config_file_path_;
 
   module::Frontend::Ptr frontend_{nullptr};
-  module::Backend::Ptr backend_{nullptr};
-  common::Map::Ptr map_{nullptr};
-  tool::Viewer::Ptr viewer_{nullptr};
 
   // dataset
   tool::Dataset::Ptr dataset_{nullptr};

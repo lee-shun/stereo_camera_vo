@@ -20,7 +20,7 @@
 #include "common/map.h"
 #include "common/camera.h"
 #include "tool/viewer.h"
-#include "module/backend.h"
+#include "module/local_BA.h"
 
 #include <Eigen/Core>
 
@@ -39,32 +39,23 @@ class Frontend {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   typedef std::shared_ptr<Frontend> Ptr;
 
-  Frontend();
+  Frontend(common::Camera::Ptr left, common::Camera::Ptr right);
 
   bool AddFrame(common::Frame::Ptr frame);
 
-  void SetMap(common::Map::Ptr map) { map_ = map; }
-  void RestMap() { map_ = common::Map::Ptr(new common::Map); }
-
-  void SetBackend(std::shared_ptr<module::Backend> backend) {
-    backend_ = backend;
-  }
-  void ResetBackend() {
-    backend_->Destory();
-    backend_ = module::Backend::Ptr(new module::Backend);
-  }
-
-  void SetViewer(std::shared_ptr<tool::Viewer> viewer) { viewer_ = viewer; }
-  void ResetViewer() { viewer_ = tool::Viewer::Ptr(new tool::Viewer); }
-
-  void SetCameras(common::Camera::Ptr left, common::Camera::Ptr right) {
-    camera_left_ = left;
-    camera_right_ = right;
-  }
-
   FrontendStatus GetStatus() const { return status_; }
 
+  void Stop() {
+    if (nullptr != local_BA_) local_BA_->Stop();
+    if (nullptr != viewer_) viewer_->Stop();
+  }
+
  private:
+  /**
+   * Init map, local BA as well as viewer
+   * @return
+   * */
+  void InitSubmodule();
   /**
    * Track in normal mode
    * @return true if success
@@ -91,7 +82,7 @@ class Frontend {
   int EstimateCurrentPose();
 
   /**
-   * set current frame as a keyframe and insert it into backend
+   * set current frame as a keyframe and insert it into local_BA
    * @return true if success
    */
   bool UpdateMapWithFrame();
@@ -136,11 +127,12 @@ class Frontend {
 
   common::Frame::Ptr current_frame_{nullptr};
   common::Frame::Ptr last_frame_{nullptr};
+
   common::Camera::Ptr camera_left_{nullptr};
   common::Camera::Ptr camera_right_{nullptr};
 
   common::Map::Ptr map_{nullptr};
-  std::shared_ptr<module::Backend> backend_{nullptr};
+  std::shared_ptr<module::LocalBA> local_BA_{nullptr};
   std::shared_ptr<tool::Viewer> viewer_{nullptr};
 
   Sophus::SE3d relative_motion_;
@@ -151,7 +143,7 @@ class Frontend {
   int num_features_{200};
   int num_features_init_{100};
   int num_features_tracking_{50};
-  int num_features_tracking_bad_{20};
+  int num_features_tracking_bad_{40};
   int num_features_needed_for_keyframe_{80};
 
   // utilities

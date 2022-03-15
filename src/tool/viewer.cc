@@ -31,8 +31,9 @@ Viewer::Viewer() {
   viewer_thread_ = std::thread(std::bind(&Viewer::ThreadLoop, this));
 }
 
-void Viewer::Close() {
+void Viewer::Stop() {
   viewer_running_ = false;
+  PRINT_INFO("stop current viewer! wait for join!");
   viewer_thread_.join();
 }
 

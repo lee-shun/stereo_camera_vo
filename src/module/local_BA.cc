@@ -1,7 +1,7 @@
 /*******************************************************************************
  *   Copyright (C) 2022 Concordia NAVlab. All rights reserved.
  *
- *   @Filename: backend.cc
+ *   @Filename: local_BA.cc
  *
  *   @Author: Shun Li
  *
@@ -13,7 +13,7 @@
  *
  *******************************************************************************/
 
-#include "module/backend.h"
+#include "module/local_BA.h"
 #include "tool/algorithm.h"
 #include "tool/print_ctrl_macro.h"
 
@@ -25,43 +25,45 @@
 namespace stereo_camera_vo {
 namespace module {
 
-// TODO(lee-shun): this backend has memory leak problems???
+// TODO(lee-shun): this local BA has memory leak problems???
 
-Backend::Backend() {
-  backend_running_.store(true);
-  backend_thread_ = std::thread(std::bind(&Backend::BackendLoop, this));
+LocalBA::LocalBA() {
+  local_BA_running_.store(true);
+  local_BA_thread_ = std::thread(std::bind(&LocalBA::ThreadLoop, this));
 }
 
-void Backend::UpdateMap() {
+void LocalBA::UpdateMap() {
   std::unique_lock<std::mutex> lock(data_mutex_);
   map_update_.notify_one();
 }
 
-void Backend::Stop() {
-  backend_running_.store(false);
+void LocalBA::Stop() {
+  local_BA_running_.store(false);
   map_update_.notify_one();
-  backend_thread_.join();
+  PRINT_INFO("stop current local BA! wait for join!");
+  local_BA_thread_.join();
 }
 
-void Backend::Destory() {
-  backend_running_.store(false);
+void LocalBA::Detach() {
+  local_BA_running_.store(false);
   map_update_.notify_one();
-  backend_thread_.detach();
+  PRINT_INFO("detach current local BA!");
+  local_BA_thread_.detach();
 }
 
-void Backend::BackendLoop() {
-  while (backend_running_.load()) {
+void LocalBA::ThreadLoop() {
+  while (local_BA_running_.load()) {
     std::unique_lock<std::mutex> lock(data_mutex_);
     map_update_.wait(lock);
 
-    // backend optimize active ONLY
+    // local BA optimize active ONLY
     common::Map::KeyframesType active_kfs = map_->GetActiveKeyFrames();
     common::Map::LandmarksType active_landmarks = map_->GetActiveMapPoints();
     Optimize(active_kfs, active_landmarks);
   }
 }
 
-void Backend::Optimize(common::Map::KeyframesType &keyframes,
+void LocalBA::Optimize(common::Map::KeyframesType &keyframes,
                        common::Map::LandmarksType &landmarks) {
   // setup g2o
   typedef g2o::BlockSolver_6_3 BlockSolverType;
@@ -179,7 +181,7 @@ void Backend::Optimize(common::Map::KeyframesType &keyframes,
   }
 }
 
-void Backend::UpdateChiTh(
+void LocalBA::UpdateChiTh(
     const std::map<EdgeProjection *, common::Feature::Ptr> &edges_and_features,
     double *chi2_th) {
   int cnt_outlier = 0, cnt_inlier = 0;

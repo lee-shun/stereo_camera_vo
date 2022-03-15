@@ -1,7 +1,7 @@
 /*******************************************************************************
  *   Copyright (C) 2022 Concordia NAVlab. All rights reserved.
  *
- *   @Filename: backend.h
+ *   @Filename: local_BA.h
  *
  *   @Author: Shun Li
  *
@@ -13,8 +13,8 @@
  *
  *******************************************************************************/
 
-#ifndef INCLUDE_MODULE_BACKEND_H_
-#define INCLUDE_MODULE_BACKEND_H_
+#ifndef INCLUDE_MODULE_LOCAL_BA_H_
+#define INCLUDE_MODULE_LOCAL_BA_H_
 
 #include "common/camera.h"
 #include "common/map.h"
@@ -31,15 +31,15 @@
 
 namespace stereo_camera_vo {
 namespace module {
-class Backend {
+class LocalBA {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  typedef std::shared_ptr<Backend> Ptr;
+  typedef std::shared_ptr<LocalBA> Ptr;
 
   /**
-   * creat backend thread and hangon
+   * creat local BA thread and hangon
    * */
-  Backend();
+  LocalBA();
 
   void SetCameras(common::Camera::Ptr left, common::Camera::Ptr right) {
     cam_left_ = left;
@@ -49,16 +49,17 @@ class Backend {
   void SetMap(std::shared_ptr<common::Map> map) { map_ = map; }
 
   /**
-   * toggle one times of backend optimization
+   * toggle one times of local BA optimization
    * */
   void UpdateMap();
 
+  void Detach();
+
   void Stop();
 
-  void Destory();
 
  private:
-  void BackendLoop();
+  void ThreadLoop();
 
   void UpdateChiTh(const std::map<EdgeProjection*, common::Feature::Ptr>&
                        edges_and_features, double* chi2_th);
@@ -67,15 +68,15 @@ class Backend {
                 common::Map::LandmarksType& landmarks);
 
   std::shared_ptr<common::Map> map_;
-  std::thread backend_thread_;
+  std::thread local_BA_thread_;
   std::mutex data_mutex_;
 
   std::condition_variable map_update_;
-  std::atomic<bool> backend_running_;
+  std::atomic<bool> local_BA_running_;
 
   common::Camera::Ptr cam_left_{nullptr}, cam_right_{nullptr};
 };
 }  // namespace module
 }  // namespace stereo_camera_vo
 
-#endif  // INCLUDE_MODULE_BACKEND_H_
+#endif  // INCLUDE_MODULE_LOCAL_BA_H_

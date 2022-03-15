@@ -1,7 +1,7 @@
 add_library(
   ${PROJECT_NAME}_module
   frontend.cc
-  backend.cc
+  local_BA.cc
 )
 
 target_link_libraries(

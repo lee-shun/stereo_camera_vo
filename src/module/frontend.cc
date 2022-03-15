@@ -30,11 +30,36 @@
 namespace stereo_camera_vo {
 namespace module {
 
-Frontend::Frontend() {
-  gftt_ = cv::GFTTDetector::create(tool::Config::Get<int>("num_features"), 0.01,
-                                   20);
-  num_features_init_ = tool::Config::Get<int>("num_features_init");
+Frontend::Frontend(common::Camera::Ptr left, common::Camera::Ptr right)
+    : camera_left_(left), camera_right_(right) {
+  /**
+   * update parameters
+   * */
   num_features_ = tool::Config::Get<int>("num_features");
+  num_features_init_ = tool::Config::Get<int>("num_features_init");
+  num_features_tracking_ = tool::Config::Get<int>("num_features_tracking");
+  num_features_tracking_bad_ =
+      tool::Config::Get<int>("num_features_tracking_bad");
+  num_features_needed_for_keyframe_ =
+      tool::Config::Get<int>("num_features_needed_for_keyframe");
+
+  InitSubmodule();
+}
+
+void Frontend::InitSubmodule() {
+  /**
+   * init submodules, all smart pointers
+   * */
+  gftt_ = cv::GFTTDetector::create(num_features_, 0.01, 20);
+
+  map_ = common::Map::Ptr(new common::Map);
+
+  local_BA_ = module::LocalBA::Ptr(new module::LocalBA);
+  local_BA_->SetMap(map_);
+  local_BA_->SetCameras(camera_left_, camera_right_);
+
+  viewer_ = tool::Viewer::Ptr(new tool::Viewer);
+  viewer_->SetMap(map_);
 }
 
 bool Frontend::AddFrame(common::Frame::Ptr frame) {
@@ -231,7 +256,7 @@ bool Frontend::UpdateMapWithFrame() {
   TriangulateNewPoints();
 
   map_->InsertKeyFrame(current_frame_);
-  backend_->UpdateMap();
+  local_BA_->UpdateMap();
 
   if (viewer_) {
     viewer_->UpdateMap();
@@ -399,7 +424,7 @@ bool Frontend::BuildInitMap() {
   }
   current_frame_->SetKeyFrame();
   map_->InsertKeyFrame(current_frame_);
-  backend_->UpdateMap();
+  local_BA_->UpdateMap();
 
   PRINT_INFO("initial map created with %zu map points!", cnt_init_landmarks);
 
@@ -408,8 +433,7 @@ bool Frontend::BuildInitMap() {
 
 bool Frontend::Reset() {
   PRINT_WARN("Reset!");
-  RestMap();
-  ResetBackend();
+  InitSubmodule();
   status_ = FrontendStatus::INITING;
   return true;
 }

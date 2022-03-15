@@ -37,7 +37,7 @@ class Viewer {
 
   void SetMap(common::Map::Ptr map) { map_ = map; }
 
-  void Close();
+  void Stop();
 
   void AddCurrentFrame(common::Frame::Ptr current_frame);
 
