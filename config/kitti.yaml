@@ -3,3 +3,13 @@
 # the tum dataset directory, change it to yours! 
 # dataset_dir: /media/xiang/Data/Dataset/Kitti/dataset/sequences/00
 dataset_dir: /media/ls/Sony32/02
+
+# camera intrinsics
+camera.fx: 517.3
+camera.fy: 516.5
+camera.cx: 325.1
+camera.cy: 249.7
+
+num_features: 150
+num_features_init: 50
+num_features_tracking: 50
