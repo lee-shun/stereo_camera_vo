@@ -82,7 +82,7 @@ bool Frontend::AddFrame(common::Frame::Ptr frame) {
 }
 
 bool Frontend::Track() {
-  if (last_frame_) {
+  if (nullptr != last_frame_) {
     current_frame_->SetPose(relative_motion_ * last_frame_->Pose());
   }
 
