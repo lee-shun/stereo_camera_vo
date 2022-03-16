@@ -308,7 +308,7 @@ bool Frontend::StereoInit() {
   int num_features_left = DetectNewFeatures();
   int num_coor_features = FindFeaturesInRight();
   if (num_coor_features < num_features_init_) {
-    PRINT_WARN("faied to init stereo, left features num: %d, right: %d",
+    PRINT_WARN("failed to init stereo, left features num: %d, right: %d",
                num_features_left, num_coor_features);
     return false;
   }
@@ -429,10 +429,16 @@ bool Frontend::BuildInitMap() {
 
 bool Frontend::Reset() {
   PRINT_WARN("reset VO!");
+  current_frame_ = nullptr;
+  last_frame_ = nullptr;
 
   map_ = common::Map::Ptr(new common::Map);
+
   local_BA_->SetMap(map_);
+
   viewer_->SetMap(map_);
+  viewer_->AddCurrentFrame(current_frame_);
+  viewer_->UpdateMap();
 
   status_ = FrontendStatus::INITING;
   return true;

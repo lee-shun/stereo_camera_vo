@@ -3,10 +3,10 @@
 
 dataset_dir: /media/ls/WORK/slam_kitti/dataset/sequences/21
 
-step_freq: 1
+step_freq: 0
 
 num_features: 200
-num_features_init: 100
+num_features_init: 70
 num_features_tracking: 50
 num_features_tracking_bad: 40
 num_features_needed_for_keyframe: 80
