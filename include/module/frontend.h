@@ -52,11 +52,6 @@ class Frontend {
 
  private:
   /**
-   * Init map, local BA as well as viewer
-   * @return
-   * */
-  void InitSubmodule();
-  /**
    * Track in normal mode
    * @return true if success
    */

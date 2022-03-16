@@ -43,10 +43,6 @@ Frontend::Frontend(common::Camera::Ptr left, common::Camera::Ptr right)
   num_features_needed_for_keyframe_ =
       tool::Config::Get<int>("num_features_needed_for_keyframe");
 
-  InitSubmodule();
-}
-
-void Frontend::InitSubmodule() {
   /**
    * init submodules, all smart pointers
    * */
@@ -432,8 +428,12 @@ bool Frontend::BuildInitMap() {
 }
 
 bool Frontend::Reset() {
-  PRINT_WARN("Reset!");
-  InitSubmodule();
+  PRINT_WARN("reset VO!");
+
+  map_ = common::Map::Ptr(new common::Map);
+  local_BA_->SetMap(map_);
+  viewer_->SetMap(map_);
+
   status_ = FrontendStatus::INITING;
   return true;
 }

@@ -28,11 +28,12 @@ namespace stereo_camera_vo {
 namespace tool {
 
 Viewer::Viewer() {
+  viewer_running_.store(true);
   viewer_thread_ = std::thread(std::bind(&Viewer::ThreadLoop, this));
 }
 
 void Viewer::Stop() {
-  viewer_running_ = false;
+  viewer_running_.store(false);
   PRINT_INFO("stop current viewer! wait for join!");
   viewer_thread_.join();
 }
@@ -44,10 +45,10 @@ void Viewer::AddCurrentFrame(common::Frame::Ptr current_frame) {
 
 void Viewer::UpdateMap() {
   std::unique_lock<std::mutex> lck(viewer_data_mutex_);
-  assert(map_ != nullptr);
-  active_keyframes_ = map_->GetActiveKeyFrames();
-  active_landmarks_ = map_->GetActiveMapPoints();
-  map_updated_ = true;
+  if (nullptr != map_) {
+    active_keyframes_ = map_->GetActiveKeyFrames();
+    active_landmarks_ = map_->GetActiveMapPoints();
+  }
 }
 
 void Viewer::ThreadLoop() {
@@ -67,12 +68,13 @@ void Viewer::ThreadLoop() {
           .SetHandler(new pangolin::Handler3D(vis_camera));
 
   const float green[3] = {0, 1, 0};
-  while (!pangolin::ShouldQuit() && viewer_running_) {
+  while (!pangolin::ShouldQuit() && viewer_running_.load()) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     vis_display.Activate(vis_camera);
 
     std::unique_lock<std::mutex> lock(viewer_data_mutex_);
+
     if (nullptr != current_frame_) {
       DrawFrame(current_frame_, green);
       FollowCurrentFrame(vis_camera);
@@ -83,7 +85,7 @@ void Viewer::ThreadLoop() {
     }
 
     if (nullptr != map_) {
-      DrawMapPoints();
+      DrawMap();
     }
 
     pangolin::FinishFrame();
@@ -160,7 +162,7 @@ void Viewer::DrawFrame(common::Frame::Ptr frame, const float* color) {
   glPopMatrix();
 }
 
-void Viewer::DrawMapPoints() {
+void Viewer::DrawMap() {
   const float red[3] = {1.0, 0, 0};
   for (auto& kf : active_keyframes_) {
     DrawFrame(kf.second, red);

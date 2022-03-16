@@ -45,12 +45,13 @@ bool VisualOdometry::Init() {
 }
 
 void VisualOdometry::Run() {
+  const int step_freq = tool::Config::Get<int>("step_freq");
   while (1) {
     PRINT_INFO("VO is running!");
     if (Step() == false) {
       break;
     }
-    // sleep(5);
+    sleep(step_freq);
   }
   frontend_->Stop();
   PRINT_INFO("VO exit!");

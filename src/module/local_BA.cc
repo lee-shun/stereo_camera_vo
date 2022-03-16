@@ -40,6 +40,12 @@ void LocalBA::UpdateMap() {
 void LocalBA::Stop() {
   local_BA_running_.store(false);
   map_update_.notify_one();
+
+  // release camera and map
+  cam_left_ = nullptr;
+  cam_right_ = nullptr;
+  map_ = nullptr;
+
   PRINT_INFO("stop current local BA! wait for join!");
   local_BA_thread_.join();
 }
@@ -47,6 +53,12 @@ void LocalBA::Stop() {
 void LocalBA::Detach() {
   local_BA_running_.store(false);
   map_update_.notify_one();
+
+  // release camera and map
+  cam_left_ = nullptr;
+  cam_right_ = nullptr;
+  map_ = nullptr;
+
   PRINT_INFO("detach current local BA!");
   local_BA_thread_.detach();
 }
@@ -57,9 +69,11 @@ void LocalBA::ThreadLoop() {
     map_update_.wait(lock);
 
     // local BA optimize active ONLY
-    common::Map::KeyframesType active_kfs = map_->GetActiveKeyFrames();
-    common::Map::LandmarksType active_landmarks = map_->GetActiveMapPoints();
-    Optimize(active_kfs, active_landmarks);
+    if (nullptr != map_) {
+      common::Map::KeyframesType active_kfs = map_->GetActiveKeyFrames();
+      common::Map::LandmarksType active_landmarks = map_->GetActiveMapPoints();
+      Optimize(active_kfs, active_landmarks);
+    }
   }
 }
 

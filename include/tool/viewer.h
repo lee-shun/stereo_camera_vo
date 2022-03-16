@@ -22,6 +22,7 @@
 #include <memory>
 #include <thread>
 #include <unordered_map>
+#include <atomic>
 
 #include <Eigen/Core>
 #include <pangolin/pangolin.h>
@@ -48,7 +49,7 @@ class Viewer {
 
   void DrawFrame(common::Frame::Ptr frame, const float* color);
 
-  void DrawMapPoints();
+  void DrawMap();
 
   void FollowCurrentFrame(pangolin::OpenGlRenderState& vis_camera);
 
@@ -59,11 +60,10 @@ class Viewer {
   common::Map::Ptr map_{nullptr};
 
   std::thread viewer_thread_;
-  bool viewer_running_{true};
+  std::atomic<bool> viewer_running_;
 
   std::unordered_map<uint64_t, common::Frame::Ptr> active_keyframes_;
   std::unordered_map<uint64_t, common::MapPoint::Ptr> active_landmarks_;
-  bool map_updated_{false};
 
   std::mutex viewer_data_mutex_;
 };
