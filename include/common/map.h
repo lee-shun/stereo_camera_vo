@@ -60,16 +60,17 @@ class Map {
     return active_keyframes_;
   }
 
-  /**
-   * clean the map point that observations is 0
-   * */
-  void CleanMap();
 
  private:
   /**
    * Deactive the old KeyFrames
    * */
-  void RemoveOldKeyframe();
+  void RemoveOldKeyframe(KeyframesType& keyframes);
+
+  /**
+   * clean the map point that observations is 0
+   * */
+  void CleanLandmarks(LandmarksType& landmarks);
 
   std::mutex data_mutex_;
 

@@ -28,8 +28,10 @@ void Map::InsertKeyFrame(Frame::Ptr frame) {
     keyframes_[frame->keyframe_id_] = frame;
     active_keyframes_[frame->keyframe_id_] = frame;
   }
+
   if (active_keyframes_.size() > num_active_keyframes_) {
-    RemoveOldKeyframe();
+    RemoveOldKeyframe(active_keyframes_);
+    CleanLandmarks(active_landmarks_);
   }
 }
 
@@ -43,14 +45,15 @@ void Map::InsertMapPoint(MapPoint::Ptr map_point) {
   }
 }
 
-void Map::RemoveOldKeyframe() {
+void Map::RemoveOldKeyframe(KeyframesType& keyframes) {
   if (current_frame_ == nullptr) return;
 
   // find out the nearest and farest keyframe, use the distance
   double max_dis = 0, min_dis = 9999;
   double max_kf_id = 0, min_kf_id = 0;
   auto Twc = current_frame_->Pose().inverse();
-  for (auto& kf : active_keyframes_) {
+
+  for (auto& kf : keyframes) {
     if (kf.second == current_frame_) continue;
     auto dis = (kf.second->Pose() * Twc).log().norm();
     if (dis > max_dis) {
@@ -66,41 +69,37 @@ void Map::RemoveOldKeyframe() {
   const double min_dis_th = 0.2;
   Frame::Ptr frame_to_remove = nullptr;
   if (min_dis < min_dis_th) {
-    // if there exists a nearest frame, remove it first.
-    frame_to_remove = keyframes_.at(min_kf_id);
+    // if there exists very near frame, remove it first.
+    frame_to_remove = keyframes.at(min_kf_id);
   } else {
-    frame_to_remove = keyframes_.at(max_kf_id);
+    // remove the farest frame.
+    frame_to_remove = keyframes.at(max_kf_id);
   }
 
   PRINT_INFO("remove keyframe %ld", frame_to_remove->keyframe_id_);
+  keyframes.erase(frame_to_remove->keyframe_id_);
 
-  // remove keyframe and landmark observation
-  active_keyframes_.erase(frame_to_remove->keyframe_id_);
-
+  // landmark observation (features)
   for (auto feat : frame_to_remove->features_left_) {
-    auto mp = feat->map_point_.lock();
-    if (mp) {
-      mp->RemoveObservation(feat);
+    auto map_point = feat->map_point_.lock();
+    if (map_point) {
+      map_point->RemoveObservation(feat);
     }
   }
   for (auto feat : frame_to_remove->features_right_) {
     if (feat == nullptr) continue;
-    auto mp = feat->map_point_.lock();
-    if (mp) {
-      mp->RemoveObservation(feat);
+    auto map_point = feat->map_point_.lock();
+    if (map_point) {
+      map_point->RemoveObservation(feat);
     }
   }
-
-  // after remove the old keyframes, landmarks may change.
-  CleanMap();
 }
 
-void Map::CleanMap() {
+void Map::CleanLandmarks(LandmarksType& landmarks) {
   int cnt_landmark_removed = 0;
-  for (auto iter = active_landmarks_.begin();
-       iter != active_landmarks_.end();) {
+  for (auto iter = landmarks.begin(); iter != landmarks.end();) {
     if (iter->second->observed_times_ == 0) {
-      iter = active_landmarks_.erase(iter);
+      iter = landmarks.erase(iter);
       cnt_landmark_removed++;
     } else {
       ++iter;
