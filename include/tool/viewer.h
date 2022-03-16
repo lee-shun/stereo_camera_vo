@@ -62,6 +62,9 @@ class Viewer {
   std::thread viewer_thread_;
   std::atomic<bool> viewer_running_;
 
+  std::unordered_map<uint64_t, common::Frame::Ptr> keyframes_;
+  std::unordered_map<uint64_t, common::MapPoint::Ptr> landmarks_;
+
   std::unordered_map<uint64_t, common::Frame::Ptr> active_keyframes_;
   std::unordered_map<uint64_t, common::MapPoint::Ptr> active_landmarks_;
 

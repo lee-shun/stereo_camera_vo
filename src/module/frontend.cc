@@ -46,7 +46,7 @@ Frontend::Frontend(common::Camera::Ptr left, common::Camera::Ptr right)
   /**
    * init submodules, all smart pointers
    * */
-  gftt_ = cv::GFTTDetector::create(num_features_, 0.01, 20);
+  cv_detector_ = cv::GFTTDetector::create(num_features_, 0.01, 10);
 
   map_ = common::Map::Ptr(new common::Map);
 
@@ -334,7 +334,7 @@ int Frontend::DetectNewFeatures() {
   }
 
   std::vector<cv::KeyPoint> keypoints;
-  gftt_->detect(current_frame_->left_img_, keypoints, mask);
+  cv_detector_->detect(current_frame_->left_img_, keypoints, mask);
 
   int cnt_detected = 0;
   for (auto &kp : keypoints) {

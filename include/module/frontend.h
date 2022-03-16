@@ -142,7 +142,7 @@ class Frontend {
   int num_features_needed_for_keyframe_{80};
 
   // utilities
-  cv::Ptr<cv::GFTTDetector> gftt_;  // feature detector in opencv
+  cv::Ptr<cv::FeatureDetector> cv_detector_;  // feature detector in opencv
 };
 }  // namespace module
 }  // namespace stereo_camera_vo

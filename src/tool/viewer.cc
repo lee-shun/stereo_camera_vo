@@ -46,6 +46,9 @@ void Viewer::AddCurrentFrame(common::Frame::Ptr current_frame) {
 void Viewer::UpdateMap() {
   std::unique_lock<std::mutex> lck(viewer_data_mutex_);
   if (nullptr != map_) {
+    keyframes_ = map_->GetAllKeyFrames();
+    landmarks_ = map_->GetAllMapPoints();
+
     active_keyframes_ = map_->GetActiveKeyFrames();
     active_landmarks_ = map_->GetActiveMapPoints();
   }
@@ -163,17 +166,31 @@ void Viewer::DrawFrame(common::Frame::Ptr frame, const float* color) {
 }
 
 void Viewer::DrawMap() {
+  // draw all keyframes
+  const float black[3] = {0, 0, 0};
   const float red[3] = {1.0, 0, 0};
-  for (auto& kf : active_keyframes_) {
-    DrawFrame(kf.second, red);
+  for (auto& kf : keyframes_) {
+    if (active_keyframes_.find(kf.first) == active_keyframes_.end()) {
+      // not in active_keyframes_
+      DrawFrame(kf.second, black);
+    } else {
+      DrawFrame(kf.second, red);
+    }
   }
-
   glPointSize(2);
   glBegin(GL_POINTS);
-  for (auto& landmark : active_landmarks_) {
+
+  // draw landmarks_
+  for (auto& landmark : landmarks_) {
     auto pos = landmark.second->Pos();
-    glColor3f(red[0], red[1], red[2]);
-    glVertex3d(pos[0], pos[1], pos[2]);
+    if (active_landmarks_.find(landmark.first) == active_landmarks_.end()) {
+      // not in active_landmarks_
+      glColor3f(black[0], black[1], black[2]);
+      glVertex3d(pos[0], pos[1], pos[2]);
+    } else {
+      glColor3f(red[0], red[1], red[2]);
+      glVertex3d(pos[0], pos[1], pos[2]);
+    }
   }
   glEnd();
 }
