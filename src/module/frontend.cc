@@ -30,7 +30,8 @@
 namespace stereo_camera_vo {
 namespace module {
 
-Frontend::Frontend(common::Camera::Ptr left, common::Camera::Ptr right)
+Frontend::Frontend(common::Camera::Ptr left, common::Camera::Ptr right,
+                   bool use_viewer)
     : camera_left_(left), camera_right_(right) {
   /**
    * update parameters
@@ -54,8 +55,10 @@ Frontend::Frontend(common::Camera::Ptr left, common::Camera::Ptr right)
   local_BA_->SetMap(map_);
   local_BA_->SetCameras(camera_left_, camera_right_);
 
-  viewer_ = tool::Viewer::Ptr(new tool::Viewer);
-  viewer_->SetMap(map_);
+  if (use_viewer) {
+    viewer_ = tool::Viewer::Ptr(new tool::Viewer);
+    viewer_->SetMap(map_);
+  }
 }
 
 bool Frontend::AddFrame(common::Frame::Ptr frame) {
@@ -96,7 +99,7 @@ bool Frontend::Track() {
 
   UpdateMapWithFrame();
 
-  if (viewer_) {
+  if (nullptr != viewer_) {
     viewer_->AddCurrentFrame(current_frame_);
   }
 
@@ -254,7 +257,7 @@ bool Frontend::UpdateMapWithFrame() {
   map_->InsertKeyFrame(current_frame_);
   local_BA_->UpdateMap();
 
-  if (viewer_) {
+  if (nullptr != viewer_) {
     viewer_->UpdateMap();
   }
   return true;
@@ -436,9 +439,11 @@ bool Frontend::Reset() {
 
   local_BA_->SetMap(map_);
 
-  viewer_->SetMap(map_);
-  viewer_->AddCurrentFrame(current_frame_);
-  viewer_->UpdateMap();
+  if (nullptr != viewer_) {
+    viewer_->SetMap(map_);
+    viewer_->AddCurrentFrame(current_frame_);
+    viewer_->UpdateMap();
+  }
 
   status_ = FrontendStatus::INITING;
   return true;

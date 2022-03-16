@@ -39,7 +39,8 @@ class Frontend {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   typedef std::shared_ptr<Frontend> Ptr;
 
-  Frontend(common::Camera::Ptr left, common::Camera::Ptr right);
+  Frontend(common::Camera::Ptr left, common::Camera::Ptr right,
+           bool use_viewer = true);
 
   bool AddFrame(common::Frame::Ptr frame);
 
