@@ -276,7 +276,7 @@ int Frontend::TriangulateNewPoints() {
   int cnt_triangulated_pts = 0;
 
   for (size_t i = 0; i < current_frame_->features_left_.size(); ++i) {
-    // if features in left doesn't bind to a mappoint, at the meanwhile, right
+    // if features in left don't bind to a mappoint, at the meanwhile, right
     // image have corresponding features, Try to triangulate these new points.
     if (current_frame_->features_left_[i]->map_point_.expired() &&
         current_frame_->features_right_[i] != nullptr) {
@@ -303,16 +303,19 @@ int Frontend::TriangulateNewPoints() {
       }
     }
   }
-  PRINT_INFO("new landmarks: %d", cnt_triangulated_pts);
+  PRINT_INFO("triangulate new landmarks: %d", cnt_triangulated_pts);
   return cnt_triangulated_pts;
 }
 
 bool Frontend::StereoInit() {
   int num_features_left = DetectNewFeatures();
-  int num_coor_features = FindFeaturesInRight();
-  if (num_coor_features < num_features_init_) {
-    PRINT_WARN("failed to init stereo, left features num: %d, right: %d",
-               num_features_left, num_coor_features);
+  int num_features_right = FindFeaturesInRight();
+  if (num_features_right < num_features_init_) {
+    PRINT_WARN(
+        "Due to inadequate features in right image, failed to init stereo, "
+        "left features num: %d, right: %d (need %d)",
+        num_features_left, num_features_right, num_features_init_);
+
     return false;
   }
 
@@ -395,37 +398,13 @@ int Frontend::FindFeaturesInRight() {
 }
 
 bool Frontend::BuildInitMap() {
-  std::vector<Sophus::SE3d> poses{camera_left_->pose(), camera_right_->pose()};
-  size_t cnt_init_landmarks = 0;
-  for (size_t i = 0; i < current_frame_->features_left_.size(); ++i) {
-    if (current_frame_->features_right_[i] == nullptr) continue;
+  int cnt_init_landmarks = TriangulateNewPoints();
 
-    // create map point from triangulation
-    std::vector<Eigen::Vector3d> points{
-        camera_left_->pixel2camera(
-            Eigen::Vector2d(current_frame_->features_left_[i]->position_.pt.x,
-                            current_frame_->features_left_[i]->position_.pt.y)),
-        camera_right_->pixel2camera(Eigen::Vector2d(
-            current_frame_->features_right_[i]->position_.pt.x,
-            current_frame_->features_right_[i]->position_.pt.y))};
-    Eigen::Vector3d pworld = Eigen::Vector3d::Zero();
-
-    if (tool::Triangulation(poses, points, pworld) && pworld[2] > 0) {
-      auto new_map_point = common::MapPoint::CreateNewMappoint();
-      new_map_point->SetPos(pworld);
-      new_map_point->AddObservation(current_frame_->features_left_[i]);
-      new_map_point->AddObservation(current_frame_->features_right_[i]);
-      current_frame_->features_left_[i]->map_point_ = new_map_point;
-      current_frame_->features_right_[i]->map_point_ = new_map_point;
-      cnt_init_landmarks++;
-      map_->InsertMapPoint(new_map_point);
-    }
-  }
   current_frame_->SetKeyFrame();
   map_->InsertKeyFrame(current_frame_);
   local_BA_->UpdateMap();
 
-  PRINT_INFO("initial map created with %zu map points!", cnt_init_landmarks);
+  PRINT_INFO("initial map created with %d map points!", cnt_init_landmarks);
 
   return true;
 }

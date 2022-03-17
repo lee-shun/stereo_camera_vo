@@ -39,7 +39,7 @@ bool VisualOdometry::Init() {
 
   // create components and links
   frontend_ = module::Frontend::Ptr(new module::Frontend(
-      dataset_->GetCamera(0), dataset_->GetCamera(1), false));
+      dataset_->GetCamera(0), dataset_->GetCamera(1), true));
 
   return true;
 }
