@@ -14,7 +14,7 @@
 *******************************************************************************/
 
 
-#include "tool/algorithm.h"
+#include "stereo_camera_vo/tool/algorithm.h"
 
 namespace stereo_camera_vo {
 namespace tool {

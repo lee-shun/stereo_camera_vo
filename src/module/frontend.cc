@@ -13,12 +13,12 @@
  *
  *******************************************************************************/
 
-#include "module/frontend.h"
-#include "module/g2o_types.h"
-#include "common/feature.h"
-#include "tool/config.h"
-#include "tool/algorithm.h"
-#include "tool/print_ctrl_macro.h"
+#include "stereo_camera_vo/module/frontend.h"
+#include "stereo_camera_vo/module/g2o_types.h"
+#include "stereo_camera_vo/common/feature.h"
+#include "stereo_camera_vo/tool/config.h"
+#include "stereo_camera_vo/tool/algorithm.h"
+#include "stereo_camera_vo/tool/print_ctrl_macro.h"
 
 #include <g2o/core/block_solver.h>
 #include <g2o/solvers/dense/linear_solver_dense.h>

@@ -13,9 +13,9 @@
  *
  *******************************************************************************/
 
-#include "common/map.h"
-#include "tool/print_ctrl_macro.h"
-#include "common/feature.h"
+#include "stereo_camera_vo/common/map.h"
+#include "stereo_camera_vo/tool/print_ctrl_macro.h"
+#include "stereo_camera_vo/common/feature.h"
 
 namespace stereo_camera_vo {
 namespace common {

@@ -13,9 +13,9 @@
  *
  *******************************************************************************/
 
-#include "common/feature.h"
-#include "tool/viewer.h"
-#include "tool/print_ctrl_macro.h"
+#include "stereo_camera_vo/common/feature.h"
+#include "stereo_camera_vo/tool/viewer.h"
+#include "stereo_camera_vo/tool/print_ctrl_macro.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>

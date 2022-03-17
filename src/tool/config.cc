@@ -13,9 +13,10 @@
  *
  *******************************************************************************/
 
-#include "tool/config.h"
+#include "stereo_camera_vo/tool/config.h"
+#include "stereo_camera_vo/tool/print_ctrl_macro.h"
+
 #include <iostream>
-#include "tool/print_ctrl_macro.h"
 
 namespace stereo_camera_vo {
 namespace tool {

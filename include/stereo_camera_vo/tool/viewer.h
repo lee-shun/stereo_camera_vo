@@ -16,8 +16,8 @@
 #ifndef INCLUDE_STEREO_CAMERA_VO_TOOL_VIEWER_H_
 #define INCLUDE_STEREO_CAMERA_VO_TOOL_VIEWER_H_
 
-#include "common/map.h"
-#include "common/frame.h"
+#include "stereo_camera_vo/common/map.h"
+#include "stereo_camera_vo/common/frame.h"
 
 #include <memory>
 #include <thread>

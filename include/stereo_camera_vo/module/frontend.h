@@ -16,11 +16,11 @@
 #ifndef INCLUDE_STEREO_CAMERA_VO_MODULE_FRONTEND_H_
 #define INCLUDE_STEREO_CAMERA_VO_MODULE_FRONTEND_H_
 
-#include "common/frame.h"
-#include "common/map.h"
-#include "common/camera.h"
-#include "tool/viewer.h"
-#include "module/local_BA.h"
+#include "stereo_camera_vo/common/frame.h"
+#include "stereo_camera_vo/common/map.h"
+#include "stereo_camera_vo/common/camera.h"
+#include "stereo_camera_vo/tool/viewer.h"
+#include "stereo_camera_vo/module/local_BA.h"
 
 #include <Eigen/Core>
 

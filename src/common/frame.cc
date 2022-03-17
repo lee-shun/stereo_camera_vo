@@ -13,7 +13,7 @@
  *
  *******************************************************************************/
 
-#include "common/frame.h"
+#include "stereo_camera_vo/common/frame.h"
 
 namespace stereo_camera_vo {
 namespace common {

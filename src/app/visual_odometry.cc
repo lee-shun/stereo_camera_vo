@@ -13,9 +13,9 @@
  *
  *******************************************************************************/
 
-#include "app/visual_odometry.h"
-#include "tool/config.h"
-#include "tool/print_ctrl_macro.h"
+#include "stereo_camera_vo/app/visual_odometry.h"
+#include "stereo_camera_vo/tool/config.h"
+#include "stereo_camera_vo/tool/print_ctrl_macro.h"
 
 #include <unistd.h>
 

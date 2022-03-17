@@ -13,8 +13,8 @@
  *
  *******************************************************************************/
 
-#include "common/map_point.h"
-#include "common/feature.h"
+#include "stereo_camera_vo/common/map_point.h"
+#include "stereo_camera_vo/common/feature.h"
 
 namespace stereo_camera_vo {
 namespace common {

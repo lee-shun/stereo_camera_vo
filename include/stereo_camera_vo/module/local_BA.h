@@ -16,10 +16,10 @@
 #ifndef INCLUDE_STEREO_CAMERA_VO_MODULE_LOCAL_BA_H_
 #define INCLUDE_STEREO_CAMERA_VO_MODULE_LOCAL_BA_H_
 
-#include "common/camera.h"
-#include "common/map.h"
-#include "module/g2o_types.h"
-#include "common/feature.h"
+#include "stereo_camera_vo/common/camera.h"
+#include "stereo_camera_vo/common/map.h"
+#include "stereo_camera_vo/module/g2o_types.h"
+#include "stereo_camera_vo/common/feature.h"
 
 #include <Eigen/Core>
 

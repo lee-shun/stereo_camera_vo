@@ -13,9 +13,9 @@
  *
  *******************************************************************************/
 
-#include "module/local_BA.h"
-#include "tool/algorithm.h"
-#include "tool/print_ctrl_macro.h"
+#include "stereo_camera_vo/module/local_BA.h"
+#include "stereo_camera_vo/tool/algorithm.h"
+#include "stereo_camera_vo/tool/print_ctrl_macro.h"
 
 #include <g2o/core/block_solver.h>
 #include <g2o/solvers/csparse/linear_solver_csparse.h>

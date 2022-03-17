@@ -16,8 +16,8 @@
 #ifndef INCLUDE_STEREO_CAMERA_VO_APP_VISUAL_ODOMETRY_H_
 #define INCLUDE_STEREO_CAMERA_VO_APP_VISUAL_ODOMETRY_H_
 
-#include "module/frontend.h"
-#include "tool/dataset.h"
+#include "stereo_camera_vo/module/frontend.h"
+#include "stereo_camera_vo/tool/dataset.h"
 #include <Eigen/Core>
 
 #include <memory>

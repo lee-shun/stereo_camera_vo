@@ -16,8 +16,8 @@
 #ifndef INCLUDE_STEREO_CAMERA_VO_TOOL_DATASET_H_
 #define INCLUDE_STEREO_CAMERA_VO_TOOL_DATASET_H_
 
-#include "common/frame.h"
-#include "common/camera.h"
+#include "stereo_camera_vo/common/frame.h"
+#include "stereo_camera_vo/common/camera.h"
 
 #include <memory>
 #include <string>

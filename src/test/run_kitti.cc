@@ -13,7 +13,7 @@
  *
  *******************************************************************************/
 
-#include "app/visual_odometry.h"
+#include "stereo_camera_vo/app/visual_odometry.h"
 
 int main(int argc, char **argv) {
   std::string config_file = "./config/kitti.yaml";
