@@ -13,8 +13,8 @@
  *
  *******************************************************************************/
 
-#ifndef INCLUDE_MODULE_LOCAL_BA_H_
-#define INCLUDE_MODULE_LOCAL_BA_H_
+#ifndef INCLUDE_STEREO_CAMERA_VO_MODULE_LOCAL_BA_H_
+#define INCLUDE_STEREO_CAMERA_VO_MODULE_LOCAL_BA_H_
 
 #include "common/camera.h"
 #include "common/map.h"
@@ -79,4 +79,4 @@ class LocalBA {
 }  // namespace module
 }  // namespace stereo_camera_vo
 
-#endif  // INCLUDE_MODULE_LOCAL_BA_H_
+#endif  // INCLUDE_STEREO_CAMERA_VO_MODULE_LOCAL_BA_H_

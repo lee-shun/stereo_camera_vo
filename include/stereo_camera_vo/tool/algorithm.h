@@ -13,8 +13,8 @@
  *
  *******************************************************************************/
 
-#ifndef INCLUDE_TOOL_ALGORITHM_H_
-#define INCLUDE_TOOL_ALGORITHM_H_
+#ifndef INCLUDE_STEREO_CAMERA_VO_TOOL_ALGORITHM_H_
+#define INCLUDE_STEREO_CAMERA_VO_TOOL_ALGORITHM_H_
 
 #include <Eigen/Core>
 
@@ -45,4 +45,4 @@ inline Eigen::Vector2d ToVec2(const cv::Point2f p) {
 }  // namespace tool
 }  // namespace stereo_camera_vo
 
-#endif  // INCLUDE_TOOL_ALGORITHM_H_
+#endif  // INCLUDE_STEREO_CAMERA_VO_TOOL_ALGORITHM_H_

@@ -13,8 +13,8 @@
  *
  *******************************************************************************/
 
-#ifndef INCLUDE_MODULE_FRONTEND_H_
-#define INCLUDE_MODULE_FRONTEND_H_
+#ifndef INCLUDE_STEREO_CAMERA_VO_MODULE_FRONTEND_H_
+#define INCLUDE_STEREO_CAMERA_VO_MODULE_FRONTEND_H_
 
 #include "common/frame.h"
 #include "common/map.h"
@@ -148,4 +148,4 @@ class Frontend {
 }  // namespace module
 }  // namespace stereo_camera_vo
 
-#endif  // INCLUDE_MODULE_FRONTEND_H_
+#endif  // INCLUDE_STEREO_CAMERA_VO_MODULE_FRONTEND_H_

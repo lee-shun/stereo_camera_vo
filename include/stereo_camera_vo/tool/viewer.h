@@ -13,8 +13,8 @@
  *
  *******************************************************************************/
 
-#ifndef INCLUDE_TOOL_VIEWER_H_
-#define INCLUDE_TOOL_VIEWER_H_
+#ifndef INCLUDE_STEREO_CAMERA_VO_TOOL_VIEWER_H_
+#define INCLUDE_STEREO_CAMERA_VO_TOOL_VIEWER_H_
 
 #include "common/map.h"
 #include "common/frame.h"
@@ -73,4 +73,4 @@ class Viewer {
 }  // namespace tool
 }  // namespace stereo_camera_vo
 
-#endif  // INCLUDE_TOOL_VIEWER_H_
+#endif  // INCLUDE_STEREO_CAMERA_VO_TOOL_VIEWER_H_

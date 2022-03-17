@@ -13,8 +13,8 @@
  *
  *******************************************************************************/
 
-#ifndef INCLUDE_COMMON_MAP_H_
-#define INCLUDE_COMMON_MAP_H_
+#ifndef INCLUDE_STEREO_CAMERA_VO_COMMON_MAP_H_
+#define INCLUDE_STEREO_CAMERA_VO_COMMON_MAP_H_
 
 #include "common/frame.h"
 #include "common/map_point.h"
@@ -86,4 +86,4 @@ class Map {
 }  // namespace common
 }  // namespace stereo_camera_vo
 
-#endif  // INCLUDE_COMMON_MAP_H_
+#endif  // INCLUDE_STEREO_CAMERA_VO_COMMON_MAP_H_

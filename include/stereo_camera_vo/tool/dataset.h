@@ -13,8 +13,8 @@
  *
  *******************************************************************************/
 
-#ifndef INCLUDE_TOOL_DATASET_H_
-#define INCLUDE_TOOL_DATASET_H_
+#ifndef INCLUDE_STEREO_CAMERA_VO_TOOL_DATASET_H_
+#define INCLUDE_STEREO_CAMERA_VO_TOOL_DATASET_H_
 
 #include "common/frame.h"
 #include "common/camera.h"
@@ -49,4 +49,4 @@ class Dataset {
 }  // namespace tool
 }  // namespace stereo_camera_vo
 
-#endif  // INCLUDE_TOOL_DATASET_H_
+#endif  // INCLUDE_STEREO_CAMERA_VO_TOOL_DATASET_H_

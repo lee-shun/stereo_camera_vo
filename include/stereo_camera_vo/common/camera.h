@@ -13,8 +13,8 @@
  *
  *******************************************************************************/
 
-#ifndef INCLUDE_COMMON_CAMERA_H_
-#define INCLUDE_COMMON_CAMERA_H_
+#ifndef INCLUDE_STEREO_CAMERA_VO_COMMON_CAMERA_H_
+#define INCLUDE_STEREO_CAMERA_VO_COMMON_CAMERA_H_
 
 #include <Eigen/Core>
 
@@ -72,4 +72,4 @@ struct Camera {
 }  // namespace common
 }  // namespace stereo_camera_vo
 
-#endif  // INCLUDE_COMMON_CAMERA_H_
+#endif  // INCLUDE_STEREO_CAMERA_VO_COMMON_CAMERA_H_

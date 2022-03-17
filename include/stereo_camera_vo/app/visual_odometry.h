@@ -13,8 +13,8 @@
  *
  *******************************************************************************/
 
-#ifndef INCLUDE_APP_VISUAL_ODOMETRY_H_
-#define INCLUDE_APP_VISUAL_ODOMETRY_H_
+#ifndef INCLUDE_STEREO_CAMERA_VO_APP_VISUAL_ODOMETRY_H_
+#define INCLUDE_STEREO_CAMERA_VO_APP_VISUAL_ODOMETRY_H_
 
 #include "module/frontend.h"
 #include "tool/dataset.h"
@@ -65,4 +65,4 @@ class VisualOdometry {
 }  // namespace app
 }  // namespace stereo_camera_vo
 
-#endif  // INCLUDE_APP_VISUAL_ODOMETRY_H_
+#endif  // INCLUDE_STEREO_CAMERA_VO_APP_VISUAL_ODOMETRY_H_

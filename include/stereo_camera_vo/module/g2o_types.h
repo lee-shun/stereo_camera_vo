@@ -13,8 +13,8 @@
  *
  *******************************************************************************/
 
-#ifndef INCLUDE_MODULE_G2O_TYPES_H_
-#define INCLUDE_MODULE_G2O_TYPES_H_
+#ifndef INCLUDE_STEREO_CAMERA_VO_MODULE_G2O_TYPES_H_
+#define INCLUDE_STEREO_CAMERA_VO_MODULE_G2O_TYPES_H_
 
 #include <Eigen/Core>
 
@@ -166,4 +166,4 @@ class EdgeProjection
 }  // namespace module
 }  // namespace stereo_camera_vo
 
-#endif  // INCLUDE_MODULE_G2O_TYPES_H_
+#endif  // INCLUDE_STEREO_CAMERA_VO_MODULE_G2O_TYPES_H_

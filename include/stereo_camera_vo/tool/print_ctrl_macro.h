@@ -15,8 +15,8 @@
 
 /* NOTE: namespace can not control macros in Cpp! */
 
-#ifndef INCLUDE_TOOL_PRINT_CTRL_MACRO_H_
-#define INCLUDE_TOOL_PRINT_CTRL_MACRO_H_
+#ifndef INCLUDE_STEREO_CAMERA_VO_TOOL_PRINT_CTRL_MACRO_H_
+#define INCLUDE_STEREO_CAMERA_VO_TOOL_PRINT_CTRL_MACRO_H_
 
 #include <cstdarg>
 #include <cstdio>
@@ -139,4 +139,4 @@
     FPRINT(PCM_DEBUG, file_name, ##__VA_ARGS__); \
   } while (0);
 
-#endif  //  INCLUDE_TOOL_PRINT_CTRL_MACRO_H_
+#endif  //  INCLUDE_STEREO_CAMERA_VO_TOOL_PRINT_CTRL_MACRO_H_
