@@ -1,5 +1,6 @@
 add_library(
   ${PROJECT_NAME}_module
+  SHARED
   frontend.cc
   local_BA.cc
 )

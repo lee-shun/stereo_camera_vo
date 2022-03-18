@@ -1,5 +1,6 @@
 add_library(
   ${PROJECT_NAME}_app
+  SHARED
   visual_odometry.cc
 )
 

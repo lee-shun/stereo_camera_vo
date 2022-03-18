@@ -1,5 +1,6 @@
 add_library(
   ${PROJECT_NAME}_tool
+  SHARED
   config.cc
   viewer.cc
   dataset.cc

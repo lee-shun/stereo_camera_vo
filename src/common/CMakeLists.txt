@@ -1,5 +1,6 @@
 add_library(
   ${PROJECT_NAME}_common
+  SHARED
   frame.cc
   feature.cc
   map_point.cc
