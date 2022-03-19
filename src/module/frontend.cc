@@ -241,6 +241,7 @@ int Frontend::EstimateCurrentPose() {
 bool Frontend::UpdateMapWithFrame() {
   if (num_tracking_inliers_ >= num_features_needed_for_keyframe_) {
     // still have enough features, don't have potential to be a keyframe.
+    PRINT_INFO("not keyframe now!");
     return false;
   }
   // current frame is a new keyframe
@@ -277,16 +278,10 @@ int Frontend::TriangulateNewPoints() {
   int cnt_triangulated_pts = 0;
 
   for (size_t i = 0; i < current_frame_->features_left_.size(); ++i) {
-    PRINT_DEBUG("current_frame_->features_left_.size() = %zu",
-                current_frame_->features_left_.size());
-
     // if features in left don't bind to a mappoint, at the meanwhile, right
     // image have corresponding features, Try to triangulate these new points.
     if (current_frame_->features_left_[i]->map_point_.expired() &&
         current_frame_->features_right_[i] != nullptr) {
-      PRINT_DEBUG("current_frame_->features_left_[i]->map_point_.expired() =%d",
-                  current_frame_->features_left_[i]->map_point_.expired());
-
       std::vector<Eigen::Vector3d> points{
           camera_left_->pixel2camera(Eigen::Vector2d(
               current_frame_->features_left_[i]->position_.pt.x,
@@ -296,10 +291,7 @@ int Frontend::TriangulateNewPoints() {
               current_frame_->features_right_[i]->position_.pt.y))};
 
       Eigen::Vector3d pworld = Eigen::Vector3d::Zero();
-      PRINT_DEBUG("tool::Triangulation(poses, points, pworld) = %d",
-                  tool::Triangulation(poses, points, pworld));
       if (tool::Triangulation(poses, points, pworld) && pworld[2] > 0) {
-        PRINT_DEBUG("in the cnt++");
         auto new_map_point = common::MapPoint::CreateNewMappoint();
         pworld = current_pose_Twc * pworld;
         new_map_point->SetPos(pworld);
