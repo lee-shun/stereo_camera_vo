@@ -1,6 +1,6 @@
-# stereo camera visual odomtry
+# stereo camera visual odometry
 
-> A very lightweight visual odomtry with local bundle adjustment (BA).
+> A very lightweight visual odometry with local bundle adjustment (BA).
 
 ## <p align="center">![run_kitti](./doc/kitti_data_test.gif)</p>
 
@@ -13,7 +13,7 @@
 
 ## Features
 
-- Stereo Camera based visual odomtry.
+- Stereo Camera based visual odometry.
 - LK optical flow is used to track the keypoints.
 - Lost tracking then relocate.
 - Insert keyframes according to the keypoints number.
