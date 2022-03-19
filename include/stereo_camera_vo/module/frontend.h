@@ -25,6 +25,7 @@
 #include <Eigen/Core>
 
 #include <memory>
+#include <string>
 
 #include <sophus/se3.hpp>
 #include <opencv2/features2d.hpp>
@@ -40,7 +41,8 @@ class Frontend {
   typedef std::shared_ptr<Frontend> Ptr;
 
   Frontend(common::Camera::Ptr left, common::Camera::Ptr right,
-           bool use_viewer = true);
+           bool use_viewer = true,
+           std::string config_file_path = "./config/kitti.yaml");
 
   bool AddFrame(common::Frame::Ptr frame);
 

@@ -31,13 +31,7 @@ class VisualOdometry {
   typedef std::shared_ptr<VisualOdometry> Ptr;
 
   /// constructor with config file
-  explicit VisualOdometry(std::string &config_path);
-
-  /**
-   * do initialization things before run
-   * @return true if success
-   */
-  bool Init();
+  explicit VisualOdometry(std::string config_path);
 
   /**
    * start vo in the dataset
@@ -55,7 +49,6 @@ class VisualOdometry {
 
  private:
   bool inited_{false};
-  std::string config_file_path_;
 
   module::Frontend::Ptr frontend_{nullptr};
 

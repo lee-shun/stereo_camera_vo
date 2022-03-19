@@ -31,11 +31,12 @@ namespace stereo_camera_vo {
 namespace module {
 
 Frontend::Frontend(common::Camera::Ptr left, common::Camera::Ptr right,
-                   bool use_viewer)
+                   bool use_viewer, std::string config_file_path)
     : camera_left_(left), camera_right_(right) {
   /**
    * update parameters
    * */
+  tool::Config::SetParameterFile(config_file_path);
   num_features_ = tool::Config::Get<int>("num_features");
   num_features_init_ = tool::Config::Get<int>("num_features_init");
   num_features_tracking_ = tool::Config::Get<int>("num_features_tracking");
