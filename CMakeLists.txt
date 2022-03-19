@@ -39,18 +39,6 @@ include_directories(${G2O_INCLUDE_DIRS})
 find_package(CSparse REQUIRED)
 include_directories(${CSPARSE_INCLUDE_DIR})
 
-# glog
-find_package(Glog REQUIRED)
-include_directories(${GLOG_INCLUDE_DIRS})
-
-# gtest
-find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
-
-# gflags
-find_package(GFlags REQUIRED)
-include_directories(${GFLAGS_INCLUDE_DIRS})
-
 set(
   THIRD_PARTY_LIBS
   ${OpenCV_LIBS}
@@ -60,9 +48,6 @@ set(
   pthread
   ${CSPARSE_LIBRARY}
   fmt::fmt
-  ${GTEST_BOTH_LIBRARIES}
-  ${GLOG_LIBRARIES}
-  ${GFLAGS_LIBRARIES}
 )
 
 
