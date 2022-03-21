@@ -95,5 +95,6 @@ common::Frame::Ptr KittiDataset::NextFrame() {
   current_image_index_++;
   return new_frame;
 }
+
 }  // namespace tool
 }  // namespace stereo_camera_vo
