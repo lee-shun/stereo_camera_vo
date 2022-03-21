@@ -5,6 +5,7 @@ add_library(
   viewer.cc
   dataset_base.cc
   kitti_dataset.cc
+  m300_dataset.cc
   algorithm.cc
 )
 target_link_libraries(

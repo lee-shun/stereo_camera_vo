@@ -18,6 +18,8 @@
 
 #include "stereo_camera_vo/tool/dataset_base.h"
 
+#include <Eigen/Core>
+
 #include <string>
 
 namespace stereo_camera_vo {
@@ -26,9 +28,24 @@ class M300Dataset : public DatasetBase {
  public:
   explicit M300Dataset(const std::string dataset_path)
       : DatasetBase(dataset_path) {}
+
   bool Init() override;
 
   common::Frame::Ptr NextFrame() override;
+
+ private:
+  // read the camera data
+  cv::FileStorage file_;
+
+  template <typename T>
+  T getParameter(const std::string key) {
+    T t;
+    file_[key] >> t;
+    return t;
+  }
+
+  void convert2Eigen(const cv::Mat proj, Eigen::Matrix3d* K,
+                     Eigen::Vector3d* t);
 };
 }  // namespace tool
 }  // namespace stereo_camera_vo
