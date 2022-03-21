@@ -35,7 +35,7 @@ class DatasetBase {
   explicit DatasetBase(const std::string dataset_path)
       : dataset_path_(dataset_path) {}
 
-  virtual ~DatasetBase();
+  virtual ~DatasetBase() {}
 
   virtual bool Init() = 0;
 

@@ -1,7 +1,5 @@
 %YAML:1.0
 ---
-dataset_dir:
-
 step_freq: 0
 
 num_features: 400
