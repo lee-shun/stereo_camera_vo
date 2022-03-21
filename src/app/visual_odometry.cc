@@ -22,21 +22,21 @@
 namespace stereo_camera_vo {
 namespace app {
 
-VisualOdometry::VisualOdometry(std::string config_path) {
-  // read from config file
+VisualOdometry::VisualOdometry(std::string config_path,
+                               tool::DatasetBase::Ptr dataset)
+    : dataset_(dataset) {
+  // read vo parameters from config file
   if (tool::Config::SetParameterFile(config_path) == false) {
     return;
   }
 
-  dataset_ = tool::Dataset::Ptr(
-      new tool::Dataset(tool::Config::Get<std::string>("dataset_dir")));
   if (!dataset_->Init()) {
     return;
   }
 
   // create components and links
   frontend_ = module::Frontend::Ptr(new module::Frontend(
-      dataset_->GetCamera(0), dataset_->GetCamera(1), true, config_path));
+      dataset_->GetCamera(0), dataset_->GetCamera(1), config_path, true));
 }
 
 void VisualOdometry::Run() {

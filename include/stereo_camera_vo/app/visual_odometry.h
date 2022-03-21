@@ -17,7 +17,7 @@
 #define INCLUDE_STEREO_CAMERA_VO_APP_VISUAL_ODOMETRY_H_
 
 #include "stereo_camera_vo/module/frontend.h"
-#include "stereo_camera_vo/tool/dataset.h"
+#include "stereo_camera_vo/tool/dataset_base.h"
 #include <Eigen/Core>
 
 #include <memory>
@@ -31,8 +31,8 @@ class VisualOdometry {
   typedef std::shared_ptr<VisualOdometry> Ptr;
 
   /// constructor with config file
-  explicit VisualOdometry(std::string config_path);
-
+  explicit VisualOdometry(std::string config_path,
+                          tool::DatasetBase::Ptr dataset);
   /**
    * start vo in the dataset
    */
@@ -53,7 +53,7 @@ class VisualOdometry {
   module::Frontend::Ptr frontend_{nullptr};
 
   // dataset
-  tool::Dataset::Ptr dataset_{nullptr};
+  tool::DatasetBase::Ptr dataset_{nullptr};
 };
 }  // namespace app
 }  // namespace stereo_camera_vo

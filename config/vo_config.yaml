@@ -1,7 +1,6 @@
 %YAML:1.0
 ---
-
-dataset_dir: /media/ls/WORK/slam_kitti/dataset/sequences/15
+dataset_dir:
 
 step_freq: 0
 

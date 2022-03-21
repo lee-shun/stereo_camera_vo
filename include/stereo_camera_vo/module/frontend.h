@@ -41,8 +41,8 @@ class Frontend {
   typedef std::shared_ptr<Frontend> Ptr;
 
   Frontend(common::Camera::Ptr left, common::Camera::Ptr right,
-           bool use_viewer = true,
-           std::string config_file_path = "./config/kitti.yaml");
+           std::string config_file_path,
+           bool use_viewer = true);
 
   bool AddFrame(common::Frame::Ptr frame);
 

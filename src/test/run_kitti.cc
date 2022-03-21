@@ -14,11 +14,19 @@
  *******************************************************************************/
 
 #include "stereo_camera_vo/app/visual_odometry.h"
+#include "stereo_camera_vo/tool/kitti_dataset.h"
 
 int main(int argc, char **argv) {
-  std::string config_file = "./config/kitti.yaml";
+  const std::string config_file = "./config/vo_config.yaml";
+  const std::string dataset_path =
+      "/media/ls/WORK/slam_kitti/dataset/sequences/15";
+
+  stereo_camera_vo::tool::DatasetBase::Ptr dataset =
+      std::make_shared<stereo_camera_vo::tool::KittiDataset>(dataset_path);
+
   stereo_camera_vo::app::VisualOdometry::Ptr vo(
-      new stereo_camera_vo::app::VisualOdometry(config_file));
+      new stereo_camera_vo::app::VisualOdometry(config_file, dataset));
+
   vo->Run();
 
   return 0;

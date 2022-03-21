@@ -31,7 +31,7 @@ namespace stereo_camera_vo {
 namespace module {
 
 Frontend::Frontend(common::Camera::Ptr left, common::Camera::Ptr right,
-                   bool use_viewer, std::string config_file_path)
+                   std::string config_file_path, bool use_viewer)
     : camera_left_(left), camera_right_(right) {
   /**
    * update parameters

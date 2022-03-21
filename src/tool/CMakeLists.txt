@@ -3,7 +3,7 @@ add_library(
   SHARED
   config.cc
   viewer.cc
-  dataset.cc
+  kitti_dataset.cc
   algorithm.cc
 )
 target_link_libraries(
