@@ -20,7 +20,7 @@
 int main(int argc, char **argv) {
   const std::string config_file = "./config/vo_config.yaml";
   const std::string dataset_path =
-      "/media/ls/WORK/slam_m300/m300_data";
+      "/media/ls/WORK/slam_m300/m300_data_1";
 
   stereo_camera_vo::tool::DatasetBase::Ptr dataset =
       std::make_shared<stereo_camera_vo::tool::M300Dataset>(dataset_path);

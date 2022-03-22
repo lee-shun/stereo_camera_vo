@@ -2,12 +2,17 @@
 
 > A very lightweight visual odometry with local bundle adjustment (BA).
 
+- Test running on [kitti dataset](http://www.cvlibs.net/datasets/kitti/eval_odometry.php). Processing each
+  frames with **20 ms**.
+
 ## <p align="center">![run_kitti](./doc/kitti_data_test.gif)</p>
+
+- Test running on DJI M300 front stereo camera, the video is recorded around Concordia University, Montreal, CA.
+
+## <p align="center">![run_m300](https://github.com/lee-shun/big_files/blob/master/images/stereo_camera_vo_images/cut.gif)</p>
 
 **NOTE:**
 
-- The gif is a test running on [kitti dataset](http://www.cvlibs.net/datasets/kitti/eval_odometry.php). Processing each
-  frames with **20 ms**.
 - Green frame indicates current camera pose, while the red and black point clouds are the active and inactive landmarks
   respectively.
 
