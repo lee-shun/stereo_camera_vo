@@ -1,0 +1,3 @@
+msleep_time: 500
+dataset_path: /media/ls/WORK/slam_m300/m300_data
+config_file: ./config/vo_config.yaml

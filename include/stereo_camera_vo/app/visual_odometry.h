@@ -36,7 +36,7 @@ class VisualOdometry {
   /**
    * start vo in the dataset
    */
-  void Run();
+  void Run(const uint64_t msleep = 0);
 
   /**
    * Make a step forward in dataset

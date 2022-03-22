@@ -17,6 +17,10 @@
 #include "stereo_camera_vo/tool/config.h"
 #include "stereo_camera_vo/tool/print_ctrl_macro.h"
 
+#include <chrono>
+#include <system_error>
+#include <thread>
+
 #include <unistd.h>
 
 namespace stereo_camera_vo {
@@ -39,14 +43,13 @@ VisualOdometry::VisualOdometry(std::string config_path,
       dataset_->GetCamera(0), dataset_->GetCamera(1), config_path, true));
 }
 
-void VisualOdometry::Run() {
-  const int step_freq = tool::Config::Get<int>("step_freq");
+void VisualOdometry::Run(const uint64_t msleep) {
   while (1) {
     PRINT_INFO("VO is running!");
     if (Step() == false) {
       break;
     }
-    sleep(step_freq);
+    std::this_thread::sleep_for(std::chrono::milliseconds(msleep));
   }
   frontend_->Stop();
   PRINT_INFO("VO exit!");

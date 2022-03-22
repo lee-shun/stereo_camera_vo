@@ -1,9 +1,7 @@
 %YAML:1.0
 ---
-step_freq: 0
-
 num_features: 500
 num_features_init: 50
 num_features_tracking: 50
-num_features_tracking_bad: 40
+num_features_tracking_bad: 20
 num_features_needed_for_keyframe: 80
