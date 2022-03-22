@@ -1,5 +1,3 @@
-%YAML:1.0
----
 num_features: 500
 num_features_init: 50
 num_features_tracking: 50

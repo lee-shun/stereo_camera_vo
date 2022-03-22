@@ -17,7 +17,7 @@
 #include "stereo_camera_vo/tool/kitti_dataset.h"
 
 int main(int argc, char **argv) {
-  const std::string config_file = "./config/vo_config.yaml";
+  const std::string config_file = "./config/frontend_config.yaml";
   const std::string dataset_path =
       "/media/ls/WORK/slam_kitti/dataset/sequences/15";
 

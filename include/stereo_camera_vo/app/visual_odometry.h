@@ -31,7 +31,7 @@ class VisualOdometry {
   typedef std::shared_ptr<VisualOdometry> Ptr;
 
   /// constructor with config file
-  explicit VisualOdometry(std::string config_path,
+  explicit VisualOdometry(std::string frontend_config_path,
                           tool::DatasetBase::Ptr dataset);
   /**
    * start vo in the dataset
