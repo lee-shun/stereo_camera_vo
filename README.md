@@ -5,9 +5,9 @@
 - Test running on [kitti dataset](http://www.cvlibs.net/datasets/kitti/eval_odometry.php). Processing each
   frames with **20 ms**.
 
-## <p align="center">![run_kitti](./doc/kitti_data_test.gif)</p>
+## <p align="center">![run_kitti](https://github.com/lee-shun/big_files/blob/master/images/stereo_camera_vo_images/kitti_data_test.gif)</p>
 
-- Test running on DJI M300 front stereo camera, the video is recorded around Concordia University, Montreal, CA.
+- Test running on DJI M300 front stereo camera, the video is recorded around [Concordia University, Montreal, CA](https://www.google.com/maps/place/Pavillon+Ev+Building/@45.495413,-73.5798817,17z/data=!4m5!3m4!1s0x4cc91a6a337243b7:0x45e30c18a8a7df4a!8m2!3d45.495413!4d-73.577693).
 
 ## <p align="center">![run_m300](https://github.com/lee-shun/big_files/blob/master/images/stereo_camera_vo_images/cut.gif)</p>
 
