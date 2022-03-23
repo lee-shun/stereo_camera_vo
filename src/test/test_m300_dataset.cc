@@ -14,10 +14,32 @@
  *******************************************************************************/
 
 #include "stereo_camera_vo/tool/m300_dataset.h"
+#include "stereo_camera_vo/tool/system_lib.h"
+
+#include <chrono>
 
 int main(int argc, char** argv) {
-  stereo_camera_vo::tool::M300Dataset m300_dataset(
-      "./config/m300_front_stereo_param.yaml");
-  m300_dataset.Init();
+  YAML::Node node = YAML::LoadFile("./config/run_m300.yaml");
+  const std::string dataset_path =
+      stereo_camera_vo::tool::GetParam<std::string>(node, "dataset_path", "");
+
+  stereo_camera_vo::tool::DatasetBase::Ptr dataset =
+      std::make_shared<stereo_camera_vo::tool::M300Dataset>(dataset_path);
+
+  dataset->Init();
+
+  std::chrono::steady_clock::time_point start =
+      std::chrono::steady_clock::now();
+  int num = 0;
+  while (nullptr != dataset->NextFrame()) {
+    ++num;
+  }
+  std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+  double each_t =
+      std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+          .count() /
+      static_cast<double>(num);
+  PRINT_INFO("average: %lf ms", each_t);
+
   return 0;
 }

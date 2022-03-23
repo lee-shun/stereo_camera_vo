@@ -21,6 +21,7 @@
 #include <Eigen/Core>
 
 #include <string>
+#include <fstream>
 
 namespace stereo_camera_vo {
 namespace tool {
@@ -35,12 +36,16 @@ class M300Dataset : public DatasetBase {
 
  private:
   // read the camera data
-  cv::FileStorage file_;
+  cv::FileStorage camera_config_file_;
+
+  // read pose data
+    std::ifstream pose_fin_;
+
 
   template <typename T>
   T getParameter(const std::string key) {
     T t;
-    file_[key] >> t;
+    camera_config_file_[key] >> t;
     return t;
   }
 
