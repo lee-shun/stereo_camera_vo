@@ -45,6 +45,8 @@ class DatasetBase {
     return cameras_.at(camera_id);
   }
 
+  int GetIndex() const { return current_image_index_; }
+
  protected:
   std::string dataset_path_;
   int current_image_index_{0};

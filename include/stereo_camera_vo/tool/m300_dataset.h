@@ -39,8 +39,7 @@ class M300Dataset : public DatasetBase {
   cv::FileStorage camera_config_file_;
 
   // read pose data
-    std::ifstream pose_fin_;
-
+  std::ifstream pose_fin_;
 
   template <typename T>
   T getParameter(const std::string key) {
@@ -51,6 +50,8 @@ class M300Dataset : public DatasetBase {
 
   void convert2Eigen(const cv::Mat proj, Eigen::Matrix3d* K,
                      Eigen::Vector3d* t);
+
+  Sophus::SE3d Twb2Twc(const Sophus::SE3d& Twb) const;
 };
 }  // namespace tool
 }  // namespace stereo_camera_vo

@@ -32,6 +32,7 @@ int main(int argc, char** argv) {
       std::chrono::steady_clock::now();
   int num = 0;
   while (nullptr != dataset->NextFrame()) {
+    PRINT_INFO("----------------");
     ++num;
   }
   std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();

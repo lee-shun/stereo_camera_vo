@@ -109,11 +109,10 @@ common::Frame::Ptr M300Dataset::NextFrame() {
   }
 
   // read pose
-  tool::SeekToLine(pose_fin_, current_image_index_ - 1);
-
   std::string pose_tmp;
   std::vector<double> q_elements;
 
+  // read each w, x, y, z, everytime
   for (int i = 0; i < 4; ++i) {
     if (!getline(pose_fin_, pose_tmp, ',')) {
       PRINT_WARN("pose reading error! at index %d", current_image_index_);
@@ -126,14 +125,30 @@ common::Frame::Ptr M300Dataset::NextFrame() {
   Eigen::Quaterniond q(q_elements[0], q_elements[1], q_elements[2],
                        q_elements[3]);
 
-  // TODO(lee-shun): rotation needed!
-  Sophus::SE3d new_frame_pose;
+  Sophus::SE3d pose_body(q, Eigen::Vector3d::Zero());
+
+  Sophus::SE3d pose_cam = Twb2Twc(pose_body);
 
   // create frame
   auto new_frame = common::Frame::CreateFrame();
   new_frame->left_img_ = image_left;
   new_frame->right_img_ = image_right;
+  new_frame->SetPose(pose_cam);
+
   return new_frame;
+}
+Sophus::SE3d M300Dataset::Twb2Twc(const Sophus::SE3d& Twb) const {
+  Eigen::Quaterniond rotate_quat_bc;
+
+  rotate_quat_bc.w() = 0.5f;
+  rotate_quat_bc.x() = -0.5f;
+  rotate_quat_bc.y() = 0.5f;
+  rotate_quat_bc.z() = -0.5f;
+
+  // camera and body coordinate only have a rotation between them...
+  Sophus::SE3d Tbc(rotate_quat_bc, Eigen::Vector3d::Zero());
+
+  return Twb * Tbc;
 }
 
 }  // namespace tool
