@@ -25,7 +25,8 @@
 namespace stereo_camera_vo {
 namespace tool {
 bool M300Dataset::Init() {
-  std::string camera_param = "./config/m300_front_stereo_param.yaml";
+  std::string camera_param =
+      dataset_path_ + "/m300_front_stereo_param.yaml";
 
   file_.open(camera_param, cv::FileStorage::READ);
   if (!file_.isOpened()) {
