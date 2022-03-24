@@ -70,8 +70,12 @@ bool Frontend::AddFrame(common::Frame::Ptr frame) {
 }
 
 bool Frontend::Track() {
+  // TODO: use the outside rotatoion
   if (nullptr != last_frame_) {
-    current_frame_->SetPose(relative_motion_ * last_frame_->Pose());
+    Sophus::SE3d current_estimate = relative_motion_ * last_frame_->Pose();
+    Sophus::SE3d current_pose(current_frame_->Pose().rotationMatrix(),
+                              current_estimate.translation());
+    current_frame_->SetPose(current_pose);
   }
 
   TrackLastFrame();
@@ -402,6 +406,7 @@ bool Frontend::Reset() {
   PRINT_WARN("reset VO!");
   current_frame_ = nullptr;
   last_frame_ = nullptr;
+  relative_motion_ = Sophus::SE3d();
 
   map_ = common::Map::Ptr(new common::Map);
 
