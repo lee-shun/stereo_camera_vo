@@ -41,6 +41,9 @@ class M300Dataset : public DatasetBase {
   // read pose data
   std::ifstream pose_fin_;
 
+  // the first frame pose
+  Sophus::SE3d first_frame_pose_Tcw_;
+
   template <typename T>
   T getParameter(const std::string key) {
     T t;

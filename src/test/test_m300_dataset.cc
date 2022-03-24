@@ -17,6 +17,7 @@
 #include "stereo_camera_vo/tool/system_lib.h"
 
 #include <chrono>
+#include <iostream>
 
 int main(int argc, char** argv) {
   YAML::Node node = YAML::LoadFile("./config/run_m300.yaml");
@@ -31,8 +32,11 @@ int main(int argc, char** argv) {
   std::chrono::steady_clock::time_point start =
       std::chrono::steady_clock::now();
   int num = 0;
-  while (nullptr != dataset->NextFrame()) {
+  stereo_camera_vo::common::Frame::Ptr new_frame = dataset->NextFrame();
+  while (nullptr != new_frame) {
     PRINT_INFO("----------------");
+    std::cout << "pose: \n" << new_frame->Pose().matrix() << std::endl;
+    new_frame = dataset->NextFrame();
     ++num;
   }
   std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();

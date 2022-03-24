@@ -48,11 +48,6 @@ bool M300Dataset::Init() {
   // left
   left_t = Eigen::Vector3d::Zero();
 
-  std::cout << "left K:\n" << left_K << std::endl;
-  std::cout << "left t:\n" << left_t << std::endl;
-  std::cout << "right K:\n" << right_K << std::endl;
-  std::cout << "right t:\n" << right_t << std::endl;
-
   // Create new cameras
   common::Camera::Ptr left_cam = std::make_shared<common::Camera>(
       left_K(0, 0), left_K(1, 1), left_K(0, 2), left_K(1, 2), left_t.norm(),
@@ -94,6 +89,7 @@ common::Frame::Ptr M300Dataset::NextFrame() {
   cv::Mat image_left, image_right;
 
   current_image_index_++;
+  PRINT_DEBUG(" current_image_index_: %d", current_image_index_);
 
   // read images
   image_left =
@@ -107,11 +103,18 @@ common::Frame::Ptr M300Dataset::NextFrame() {
     PRINT_WARN("can not find images at index %d", current_image_index_);
     return nullptr;
   }
+  // create frame
+  auto new_frame = common::Frame::CreateFrame();
+  new_frame->left_img_ = image_left;
+  new_frame->right_img_ = image_right;
 
-  // read pose
+  /*
+   * Step: read pose
+   * */
   std::string pose_tmp;
   std::vector<double> q_elements;
 
+  tool::SeekToLine(pose_fin_, current_image_index_-1);
   // read each w, x, y, z, everytime
   for (int i = 0; i < 4; ++i) {
     if (!getline(pose_fin_, pose_tmp, ',')) {
@@ -125,18 +128,26 @@ common::Frame::Ptr M300Dataset::NextFrame() {
   Eigen::Quaterniond q(q_elements[0], q_elements[1], q_elements[2],
                        q_elements[3]);
 
-  Sophus::SE3d pose_body(q, Eigen::Vector3d::Zero());
+  Sophus::SE3d pose_body_Twb(q, Eigen::Vector3d::Zero());
 
-  Sophus::SE3d pose_cam = Twb2Twc(pose_body);
+  Sophus::SE3d pose_cam_Tcw = Twb2Twc(pose_body_Twb).inverse();
 
-  // create frame
-  auto new_frame = common::Frame::CreateFrame();
-  new_frame->left_img_ = image_left;
-  new_frame->right_img_ = image_right;
-  new_frame->SetPose(pose_cam);
+  if (0 == current_image_index_ - 1) {
+    first_frame_pose_Tcw_ = pose_cam_Tcw;
+    std::cout << "First frame:\n"
+              << first_frame_pose_Tcw_.matrix() << std::endl;
+  }
+
+  // get current frame pose (it is actually relative motion according to the
+  // first frame ...)
+  Sophus::SE3d realtive_pose_Tcw =
+      pose_cam_Tcw * first_frame_pose_Tcw_.inverse();
+
+  new_frame->SetPose(realtive_pose_Tcw);
 
   return new_frame;
 }
+
 Sophus::SE3d M300Dataset::Twb2Twc(const Sophus::SE3d& Twb) const {
   Eigen::Quaterniond rotate_quat_bc;
 
