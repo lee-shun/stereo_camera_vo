@@ -73,8 +73,14 @@ bool Frontend::Track() {
   // TODO: use the outside rotatoion
   if (nullptr != last_frame_) {
     Sophus::SE3d current_estimate = relative_motion_ * last_frame_->Pose();
-    Sophus::SE3d current_pose(current_frame_->Pose().rotationMatrix(),
-                              current_estimate.translation());
+
+    Sophus::SE3d current_pose;
+    if (current_frame_->use_init_pose_) {
+      current_pose = Sophus::SE3d(current_frame_->Pose().rotationMatrix(),
+                                  current_estimate.translation());
+    } else {
+      current_pose = current_estimate;
+    }
     current_frame_->SetPose(current_pose);
   }
 

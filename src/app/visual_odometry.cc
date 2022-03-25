@@ -69,9 +69,11 @@ bool VisualOdometry::Step() {
   if (new_frame == nullptr) return false;
 
   auto t1 = std::chrono::steady_clock::now();
-  std::cout << "pose before: \n" << new_frame->Pose().matrix() << std::endl;
+  std::cout << "pose before: \n"
+            << new_frame->Pose().inverse().matrix() << std::endl;
   bool success = frontend_->AddFrame(new_frame);
-  std::cout << "pose after: \n" << new_frame->Pose().matrix() << std::endl;
+  std::cout << "pose after: \n"
+            << new_frame->Pose().inverse().matrix() << std::endl;
   auto t2 = std::chrono::steady_clock::now();
   auto time_used =
       std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);

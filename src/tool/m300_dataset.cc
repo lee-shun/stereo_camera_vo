@@ -143,6 +143,7 @@ common::Frame::Ptr M300Dataset::NextFrame() {
   Sophus::SE3d realtive_pose_Tcw =
       pose_cam_Tcw * first_frame_pose_Tcw_.inverse();
 
+  new_frame->use_init_pose_ = true;
   new_frame->SetPose(realtive_pose_Tcw);
 
   return new_frame;

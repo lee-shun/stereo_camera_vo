@@ -65,6 +65,7 @@ struct Frame {
   uint64_t id_{0};
   uint64_t keyframe_id_{0};
   bool is_keyframe_{false};
+  bool use_init_pose_{false};
   double time_stamp_;
 
   // Note the pose is Tcw;
