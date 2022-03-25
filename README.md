@@ -27,12 +27,15 @@
 ## Dependencies
 
 - [g2o](https://github.com/RainerKuemmerle/g2o)
+
   > optimization in local bundle adjustment and frontend camera pose estimation.
 
 - [pangolin](https://github.com/stevenlovegrove/Pangolin)
+
   > visualization
 
 - [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page) & [Sophus](https://github.com/strasdat/Sophus)
+
   > basic matrix operations and Lie Algebra operations.
 
 - [OpenCV 4](https://opencv.org/)
@@ -45,4 +48,4 @@ denied environments.
 
 ## Acknowledgement
 
-[*"14 Lectures on Visual SLAM: From Theory to Practice"* Xiang Gao](https://github.com/gaoxiang12/slambook-en)
+[_"14 Lectures on Visual SLAM: From Theory to Practice"_ Xiang Gao](https://github.com/gaoxiang12/slambook-en)
