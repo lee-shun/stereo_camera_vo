@@ -16,7 +16,6 @@
 #include "stereo_camera_vo/module/frontend.h"
 #include "stereo_camera_vo/module/g2o_types.h"
 #include "stereo_camera_vo/common/feature.h"
-#include "stereo_camera_vo/tool/config.h"
 #include "stereo_camera_vo/tool/algorithm.h"
 #include "stereo_camera_vo/tool/print_ctrl_macro.h"
 
@@ -31,24 +30,12 @@ namespace stereo_camera_vo {
 namespace module {
 
 Frontend::Frontend(common::Camera::Ptr left, common::Camera::Ptr right,
-                   std::string config_file_path, bool use_viewer)
-    : camera_left_(left), camera_right_(right) {
-  /**
-   * update parameters
-   * */
-  tool::Config::SetParameterFile(config_file_path);
-  num_features_ = tool::Config::Get<int>("num_features");
-  num_features_init_ = tool::Config::Get<int>("num_features_init");
-  num_features_tracking_ = tool::Config::Get<int>("num_features_tracking");
-  num_features_tracking_bad_ =
-      tool::Config::Get<int>("num_features_tracking_bad");
-  num_features_needed_for_keyframe_ =
-      tool::Config::Get<int>("num_features_needed_for_keyframe");
-
+                   const Param &param, bool use_viewer)
+    : camera_left_(left), camera_right_(right), param_(param) {
   /**
    * init submodules, all smart pointers
    * */
-  cv_detector_ = cv::GFTTDetector::create(num_features_, 0.01, 10);
+  cv_detector_ = cv::GFTTDetector::create(param_.num_features_, 0.01, 10);
 
   map_ = common::Map::Ptr(new common::Map);
 
@@ -83,16 +70,26 @@ bool Frontend::AddFrame(common::Frame::Ptr frame) {
 }
 
 bool Frontend::Track() {
+  // TODO: use the outside rotatoion
   if (nullptr != last_frame_) {
-    current_frame_->SetPose(relative_motion_ * last_frame_->Pose());
+    Sophus::SE3d current_estimate = relative_motion_ * last_frame_->Pose();
+
+    Sophus::SE3d current_pose;
+    if (current_frame_->use_init_pose_) {
+      current_pose = Sophus::SE3d(current_frame_->Pose().rotationMatrix(),
+                                  current_estimate.translation());
+    } else {
+      current_pose = current_estimate;
+    }
+    current_frame_->SetPose(current_pose);
   }
 
   TrackLastFrame();
   num_tracking_inliers_ = EstimateCurrentPose();
 
-  if (num_tracking_inliers_ > num_features_tracking_) {
+  if (num_tracking_inliers_ > param_.num_features_tracking_) {
     status_ = FrontendStatus::TRACKING_GOOD;
-  } else if (num_tracking_inliers_ > num_features_tracking_bad_) {
+  } else if (num_tracking_inliers_ > param_.num_features_tracking_bad_) {
     status_ = FrontendStatus::TRACKING_BAD;
   } else {
     status_ = FrontendStatus::LOST;
@@ -239,7 +236,7 @@ int Frontend::EstimateCurrentPose() {
 }
 
 bool Frontend::UpdateMapWithFrame() {
-  if (num_tracking_inliers_ >= num_features_needed_for_keyframe_) {
+  if (num_tracking_inliers_ >= param_.num_features_needed_for_keyframe_) {
     // still have enough features, don't have potential to be a keyframe.
     PRINT_INFO("not keyframe now!");
     return false;
@@ -312,11 +309,11 @@ int Frontend::TriangulateNewPoints() {
 bool Frontend::StereoInit() {
   int num_features_left = DetectNewFeatures();
   int num_features_right = FindFeaturesInRight();
-  if (num_features_right < num_features_init_) {
+  if (num_features_right < param_.num_features_init_) {
     PRINT_WARN(
         "Due to inadequate features in right image, failed to init stereo, "
         "left features num: %d, right: %d (need %d)",
-        num_features_left, num_features_right, num_features_init_);
+        num_features_left, num_features_right, param_.num_features_init_);
 
     return false;
   }
@@ -415,6 +412,7 @@ bool Frontend::Reset() {
   PRINT_WARN("reset VO!");
   current_frame_ = nullptr;
   last_frame_ = nullptr;
+  relative_motion_ = Sophus::SE3d();
 
   map_ = common::Map::Ptr(new common::Map);
 

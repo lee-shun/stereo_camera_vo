@@ -21,6 +21,7 @@
 #include <Eigen/Core>
 
 #include <string>
+#include <fstream>
 
 namespace stereo_camera_vo {
 namespace tool {
@@ -35,17 +36,25 @@ class M300Dataset : public DatasetBase {
 
  private:
   // read the camera data
-  cv::FileStorage file_;
+  cv::FileStorage camera_config_file_;
+
+  // read pose data
+  std::ifstream pose_fin_;
+
+  // the first frame pose
+  Sophus::SE3d first_frame_pose_Tcw_;
 
   template <typename T>
   T getParameter(const std::string key) {
     T t;
-    file_[key] >> t;
+    camera_config_file_[key] >> t;
     return t;
   }
 
   void convert2Eigen(const cv::Mat proj, Eigen::Matrix3d* K,
                      Eigen::Vector3d* t);
+
+  Sophus::SE3d Twb2Twc(const Sophus::SE3d& Twb) const;
 };
 }  // namespace tool
 }  // namespace stereo_camera_vo

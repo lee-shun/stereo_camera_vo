@@ -14,20 +14,26 @@
  *******************************************************************************/
 
 #include "stereo_camera_vo/app/visual_odometry.h"
+#include "stereo_camera_vo/tool/system_lib.h"
 #include "stereo_camera_vo/tool/kitti_dataset.h"
 
 int main(int argc, char **argv) {
-  const std::string config_file = "./config/vo_config.yaml";
-  const std::string dataset_path =
-      "/media/ls/WORK/slam_kitti/dataset/sequences/15";
+  YAML::Node node = YAML::LoadFile("./config/run_kitti.yaml");
+  const uint64_t msleep_time =
+      stereo_camera_vo::tool::GetParam(node, "msleep_time", 1000);
 
+  const std::string config_file =
+      stereo_camera_vo::tool::GetParam<std::string>(node, "config_file", "");
+
+  const std::string dataset_path =
+      stereo_camera_vo::tool::GetParam<std::string>(node, "dataset_path", "");
   stereo_camera_vo::tool::DatasetBase::Ptr dataset =
       std::make_shared<stereo_camera_vo::tool::KittiDataset>(dataset_path);
 
   stereo_camera_vo::app::VisualOdometry::Ptr vo(
       new stereo_camera_vo::app::VisualOdometry(config_file, dataset));
 
-  vo->Run();
+  vo->Run(msleep_time);
 
   return 0;
 }

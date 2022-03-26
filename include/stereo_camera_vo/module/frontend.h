@@ -40,9 +40,16 @@ class Frontend {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   typedef std::shared_ptr<Frontend> Ptr;
 
+  struct Param {
+    int num_features_{200};
+    int num_features_init_{100};
+    int num_features_tracking_{50};
+    int num_features_tracking_bad_{40};
+    int num_features_needed_for_keyframe_{80};
+  };
+
   Frontend(common::Camera::Ptr left, common::Camera::Ptr right,
-           std::string config_file_path,
-           bool use_viewer = true);
+           const Param& param, bool use_viewer = true);
 
   bool AddFrame(common::Frame::Ptr frame);
 
@@ -138,11 +145,7 @@ class Frontend {
   uint16_t num_tracking_inliers_{0};  // inliers, used for testing new keyframes
 
   // params
-  int num_features_{200};
-  int num_features_init_{100};
-  int num_features_tracking_{50};
-  int num_features_tracking_bad_{40};
-  int num_features_needed_for_keyframe_{80};
+  Param param_;
 
   // utilities
   cv::Ptr<cv::FeatureDetector> cv_detector_;  // feature detector in opencv

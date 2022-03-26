@@ -1,0 +1,3 @@
+msleep_time: 500
+config_file: ./config/frontend_config.yaml
+dataset_path: /media/ls/WORK/slam_kitti/dataset/sequences/15

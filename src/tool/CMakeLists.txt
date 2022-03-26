@@ -1,7 +1,6 @@
 add_library(
   ${PROJECT_NAME}_tool
   SHARED
-  config.cc
   viewer.cc
   dataset_base.cc
   kitti_dataset.cc

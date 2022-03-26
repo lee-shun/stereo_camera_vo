@@ -45,11 +45,13 @@ struct Frame {
   Frame(uint64_t id, double time_stamp, const Sophus::SE3d &pose,
         const cv::Mat &left, const cv::Mat &right);
 
+  // Note the pose is Tcw;
   Sophus::SE3d Pose() {
     std::unique_lock<std::mutex> lck(pose_mutex_);
     return pose_;
   }
 
+  // Note the pose is Tcw;
   void SetPose(const Sophus::SE3d &pose) {
     std::unique_lock<std::mutex> lck(pose_mutex_);
     pose_ = pose;
@@ -63,8 +65,10 @@ struct Frame {
   uint64_t id_{0};
   uint64_t keyframe_id_{0};
   bool is_keyframe_{false};
+  bool use_init_pose_{false};
   double time_stamp_;
 
+  // Note the pose is Tcw;
   Sophus::SE3d pose_;
   std::mutex pose_mutex_;
 

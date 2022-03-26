@@ -39,6 +39,9 @@ include_directories(${G2O_INCLUDE_DIRS})
 find_package(CSparse REQUIRED)
 include_directories(${CSPARSE_INCLUDE_DIR})
 
+# yaml
+find_package(yaml-cpp REQUIRED)
+
 set(
   THIRD_PARTY_LIBS
   ${OpenCV_LIBS}
@@ -48,6 +51,7 @@ set(
   pthread
   ${CSPARSE_LIBRARY}
   fmt::fmt
+  yaml-cpp
 )
 
 

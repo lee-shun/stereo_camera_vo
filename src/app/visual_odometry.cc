@@ -14,39 +14,51 @@
  *******************************************************************************/
 
 #include "stereo_camera_vo/app/visual_odometry.h"
-#include "stereo_camera_vo/tool/config.h"
 #include "stereo_camera_vo/tool/print_ctrl_macro.h"
+#include "stereo_camera_vo/tool/system_lib.h"
+
+#include <chrono>
+#include <system_error>
+#include <thread>
 
 #include <unistd.h>
 
 namespace stereo_camera_vo {
 namespace app {
 
-VisualOdometry::VisualOdometry(std::string config_path,
+VisualOdometry::VisualOdometry(std::string frontend_config_path,
                                tool::DatasetBase::Ptr dataset)
     : dataset_(dataset) {
-  // read vo parameters from config file
-  if (tool::Config::SetParameterFile(config_path) == false) {
-    return;
-  }
-
   if (!dataset_->Init()) {
     return;
   }
 
-  // create components and links
+  // read vo parameters from config file
+  module::Frontend::Param frontend_param;
+
+  YAML::Node node = YAML::LoadFile(frontend_config_path);
+  frontend_param.num_features_ = tool::GetParam<int>(node, "num_features", 200);
+  frontend_param.num_features_init_ =
+      tool::GetParam<int>(node, "num_features_init", 100);
+  frontend_param.num_features_tracking_ =
+      tool::GetParam<int>(node, "num_features_tracking", 50);
+  frontend_param.num_features_tracking_bad_ =
+      tool::GetParam<int>(node, "num_features_tracking_bad", 40);
+  frontend_param.num_features_needed_for_keyframe_ =
+      tool::GetParam<int>(node, "num_features_needed_for_keyframe", 80);
+
+  // create frontend
   frontend_ = module::Frontend::Ptr(new module::Frontend(
-      dataset_->GetCamera(0), dataset_->GetCamera(1), config_path, true));
+      dataset_->GetCamera(0), dataset_->GetCamera(1), frontend_param, true));
 }
 
-void VisualOdometry::Run() {
-  const int step_freq = tool::Config::Get<int>("step_freq");
+void VisualOdometry::Run(const uint64_t msleep) {
   while (1) {
     PRINT_INFO("VO is running!");
     if (Step() == false) {
       break;
     }
-    sleep(step_freq);
+    std::this_thread::sleep_for(std::chrono::milliseconds(msleep));
   }
   frontend_->Stop();
   PRINT_INFO("VO exit!");
@@ -57,9 +69,11 @@ bool VisualOdometry::Step() {
   if (new_frame == nullptr) return false;
 
   auto t1 = std::chrono::steady_clock::now();
-  std::cout << "pose before: \n" << new_frame->Pose().matrix() << std::endl;
+  std::cout << "pose before: \n"
+            << new_frame->Pose().inverse().matrix() << std::endl;
   bool success = frontend_->AddFrame(new_frame);
-  std::cout << "pose after: \n" << new_frame->Pose().matrix() << std::endl;
+  std::cout << "pose after: \n"
+            << new_frame->Pose().inverse().matrix() << std::endl;
   auto t2 = std::chrono::steady_clock::now();
   auto time_used =
       std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
