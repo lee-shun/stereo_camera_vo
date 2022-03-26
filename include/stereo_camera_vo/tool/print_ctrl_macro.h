@@ -55,15 +55,15 @@
     }                                       \
   } while (0);
 
-#define PRINT(color, level, ...)                                      \
-  do {                                                                \
-    if (level <= PCM_PRINT_LEVEL) {                                   \
-      printf(PCM_COLOR(color, "[" #level "]"));                       \
+#define PRINT(color, level, ...)                                       \
+  do {                                                                 \
+    if (level <= PCM_PRINT_LEVEL) {                                    \
+      printf(PCM_COLOR(color, "[" #level "]"));                        \
       printf(PCM_COLOR(36, " %s:%d (in %s) "), PCM_FILENAME(__FILE__), \
-             __LINE__, __FUNCTION__);                                 \
-      printf(__VA_ARGS__);                                            \
-      printf("\n");                                                   \
-    }                                                                 \
+             __LINE__, __FUNCTION__);                                  \
+      printf(__VA_ARGS__);                                             \
+      printf("\n");                                                    \
+    }                                                                  \
   } while (0);
 
 #define PRINT_ERROR(...)                 \
