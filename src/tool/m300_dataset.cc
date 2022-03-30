@@ -99,7 +99,7 @@ bool M300Dataset::NextFrame(common::Frame::Ptr new_frame) {
 
   if (0 == current_image_index_ - 1) {
     first_frame_pose_Tcw_ = pose_cam_Tcw;
-    std::cout << "First frame:\n"
+    std::cout << "First frame absolute pose Tcw:\n"
               << first_frame_pose_Tcw_.matrix() << std::endl;
   }
 
