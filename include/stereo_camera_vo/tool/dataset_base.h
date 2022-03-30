@@ -39,8 +39,7 @@ class DatasetBase {
 
   virtual bool Init() = 0;
 
-  // TODO: change the interface with boolean indentify the images...
-  virtual common::Frame::Ptr NextFrame() = 0;
+  virtual  bool NextFrame(common::Frame::Ptr new_frame) = 0;
 
   common::Camera::Ptr GetCamera(const int camera_id) const {
     return cameras_.at(camera_id);

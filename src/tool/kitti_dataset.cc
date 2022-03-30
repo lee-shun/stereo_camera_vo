@@ -67,7 +67,7 @@ bool KittiDataset::Init() {
   return true;
 }
 
-common::Frame::Ptr KittiDataset::NextFrame() {
+bool KittiDataset::NextFrame(common::Frame::Ptr new_frame ) {
   boost::format fmt("%s/image_%d/%06d.png");
   cv::Mat image_left, image_right;
   // read images
@@ -80,7 +80,7 @@ common::Frame::Ptr KittiDataset::NextFrame() {
 
   if (image_left.data == nullptr || image_right.data == nullptr) {
     PRINT_ERROR("cannot find images at index %d!", current_image_index_);
-    return nullptr;
+    return false;
   }
 
   cv::Mat image_left_resized, image_right_resized;
@@ -89,11 +89,11 @@ common::Frame::Ptr KittiDataset::NextFrame() {
   cv::resize(image_right, image_right_resized, cv::Size(), 0.5, 0.5,
              cv::INTER_NEAREST);
 
-  auto new_frame = common::Frame::CreateFrame();
   new_frame->left_img_ = image_left_resized;
   new_frame->right_img_ = image_right_resized;
   current_image_index_++;
-  return new_frame;
+
+  return true;
 }
 
 }  // namespace tool

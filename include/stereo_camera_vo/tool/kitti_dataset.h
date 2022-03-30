@@ -31,7 +31,7 @@ class KittiDataset : public DatasetBase {
 
   bool Init() override;
 
-  common::Frame::Ptr NextFrame() override;
+  bool NextFrame(common::Frame::Ptr new_frame) override;
 };
 }  // namespace tool
 }  // namespace stereo_camera_vo

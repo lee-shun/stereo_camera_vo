@@ -31,12 +31,15 @@ int main(int argc, char** argv) {
 
   std::chrono::steady_clock::time_point start =
       std::chrono::steady_clock::now();
+
   int num = 0;
-  stereo_camera_vo::common::Frame::Ptr new_frame = dataset->NextFrame();
-  while (nullptr != new_frame) {
+  stereo_camera_vo::common::Frame::Ptr new_frame =
+      stereo_camera_vo::common::Frame::CreateFrame();
+  while (dataset->NextFrame(new_frame)) {
     PRINT_INFO("----------------");
     std::cout << "pose: \n" << new_frame->Pose().matrix() << std::endl;
-    new_frame = dataset->NextFrame();
+  stereo_camera_vo::common::Frame::Ptr new_frame =
+      stereo_camera_vo::common::Frame::CreateFrame();
     ++num;
   }
   std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();

@@ -59,32 +59,10 @@ bool M300Dataset::Init() {
       right_t.norm(), Sophus::SE3d(Sophus::SO3d(), right_t));
   cameras_.push_back(right_cam);
 
-  /**
-   * get pose
-   * */
-  const std::string pose_file = dataset_path_ + "/pose.txt";
-  pose_fin_.open(pose_file);
-  if (!pose_fin_) {
-    PRINT_ERROR("can not open %s in given path, no such file or directory!",
-                pose_file.c_str());
-    return false;
-  }
-
   return true;
 }
 
-void M300Dataset::convert2Eigen(const cv::Mat proj, Eigen::Matrix3d* K,
-                                Eigen::Vector3d* t) {
-  (*K) << proj.at<double>(0, 0), proj.at<double>(0, 1), proj.at<double>(0, 2),
-      proj.at<double>(1, 0), proj.at<double>(1, 1), proj.at<double>(1, 2),
-      proj.at<double>(2, 0), proj.at<double>(2, 1), proj.at<double>(2, 2);
-
-  (*t) << proj.at<double>(0, 3), proj.at<double>(1, 3), proj.at<double>(2, 3);
-
-  (*t) = (*K).inverse() * (*t);
-}
-
-common::Frame::Ptr M300Dataset::NextFrame() {
+bool M300Dataset::NextFrame(common::Frame::Ptr new_frame) {
   boost::format fmt("%s/image_%d/%d.png");
   cv::Mat image_left, image_right;
 
@@ -101,35 +79,22 @@ common::Frame::Ptr M300Dataset::NextFrame() {
 
   if (image_left.data == nullptr || image_right.data == nullptr) {
     PRINT_WARN("can not find images at index %d", current_image_index_);
-    return nullptr;
+    return false;
   }
-  // create frame
-  auto new_frame = common::Frame::CreateFrame();
+
   new_frame->left_img_ = image_left;
   new_frame->right_img_ = image_right;
 
   /*
    * Step: read pose
    * */
-  std::string pose_tmp;
-  std::vector<double> q_elements;
-
-  tool::SeekToLine(pose_fin_, current_image_index_-1);
-  // read each w, x, y, z, everytime
-  for (int i = 0; i < 4; ++i) {
-    if (!getline(pose_fin_, pose_tmp, ',')) {
-      PRINT_WARN("pose reading error! at index %d", current_image_index_);
-      return nullptr;
-    }
-    // PRINT_DEBUG("read pose-wxyz:%.8f", std::stod(pose_tmp));
-    q_elements.push_back(std::stod(pose_tmp));
+  Eigen::Quaterniond att_body;
+  if (!GetAttByIndex(dataset_path_ + "/pose.txt", current_image_index_ - 1,
+                     &att_body)) {
+    return false;
   }
 
-  Eigen::Quaterniond q(q_elements[0], q_elements[1], q_elements[2],
-                       q_elements[3]);
-
-  Sophus::SE3d pose_body_Twb(q, Eigen::Vector3d::Zero());
-
+  Sophus::SE3d pose_body_Twb(att_body, Eigen::Vector3d::Zero());
   Sophus::SE3d pose_cam_Tcw = Twb2Twc(pose_body_Twb).inverse();
 
   if (0 == current_image_index_ - 1) {
@@ -146,7 +111,18 @@ common::Frame::Ptr M300Dataset::NextFrame() {
   new_frame->use_init_pose_ = true;
   new_frame->SetPose(realtive_pose_Tcw);
 
-  return new_frame;
+  return true;
+}
+
+void M300Dataset::convert2Eigen(const cv::Mat proj, Eigen::Matrix3d* K,
+                                Eigen::Vector3d* t) {
+  (*K) << proj.at<double>(0, 0), proj.at<double>(0, 1), proj.at<double>(0, 2),
+      proj.at<double>(1, 0), proj.at<double>(1, 1), proj.at<double>(1, 2),
+      proj.at<double>(2, 0), proj.at<double>(2, 1), proj.at<double>(2, 2);
+
+  (*t) << proj.at<double>(0, 3), proj.at<double>(1, 3), proj.at<double>(2, 3);
+
+  (*t) = (*K).inverse() * (*t);
 }
 
 Sophus::SE3d M300Dataset::Twb2Twc(const Sophus::SE3d& Twb) const {
@@ -161,6 +137,35 @@ Sophus::SE3d M300Dataset::Twb2Twc(const Sophus::SE3d& Twb) const {
   Sophus::SE3d Tbc(rotate_quat_bc, Eigen::Vector3d::Zero());
 
   return Twb * Tbc;
+}
+
+bool M300Dataset::GetAttByIndex(const std::string pose_path,
+                                const int pose_index, Eigen::Quaterniond* att) {
+  std::ifstream pose_fin_;
+  pose_fin_.open(pose_path);
+  if (!pose_fin_) {
+    PRINT_ERROR("can not open %s in given path, no such file or directory!",
+                pose_path.c_str());
+    return false;
+  }
+
+  std::string pose_tmp;
+  std::vector<double> q_elements;
+  stereo_camera_vo::tool::SeekToLine(pose_fin_, pose_index);
+  // read each w, x, y, z, everytime
+  for (int i = 0; i < 4; ++i) {
+    if (!getline(pose_fin_, pose_tmp, ',')) {
+      PRINT_ERROR("pose reading error! at index %d", pose_index);
+      return false;
+    }
+    // PRINT_DEBUG("read pose-wxyz:%.8f", std::stod(pose_tmp));
+    q_elements.push_back(std::stod(pose_tmp));
+  }
+
+  *att = Eigen::Quaterniond(q_elements[0], q_elements[1], q_elements[2],
+                            q_elements[3]);
+
+  return true;
 }
 
 }  // namespace tool

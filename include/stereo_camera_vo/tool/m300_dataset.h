@@ -32,14 +32,14 @@ class M300Dataset : public DatasetBase {
 
   bool Init() override;
 
-  common::Frame::Ptr NextFrame() override;
+  bool NextFrame(common::Frame::Ptr new_frame) override;
+
+  static bool GetAttByIndex(const std::string pose_path, const int pose_index,
+                            Eigen::Quaterniond* att);
 
  private:
   // read the camera data
   cv::FileStorage camera_config_file_;
-
-  // read pose data
-  std::ifstream pose_fin_;
 
   // the first frame pose
   Sophus::SE3d first_frame_pose_Tcw_;

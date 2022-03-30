@@ -65,8 +65,11 @@ void VisualOdometry::Run(const uint64_t msleep) {
 }
 
 bool VisualOdometry::Step() {
-  common::Frame::Ptr new_frame = dataset_->NextFrame();
-  if (new_frame == nullptr) return false;
+  common::Frame::Ptr new_frame = common::Frame::CreateFrame();
+  if (!dataset_->NextFrame(new_frame)) {
+    PRINT_INFO("end of vo!");
+    return false;
+  }
 
   auto t1 = std::chrono::steady_clock::now();
   std::cout << "pose before: \n"
