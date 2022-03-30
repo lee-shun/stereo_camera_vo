@@ -9,5 +9,6 @@ add_library(
 )
 target_link_libraries(
   ${PROJECT_NAME}_tool
+  ${PROJECT_NAME}_common
   ${THIRD_PARTY_LIBS}
 )
