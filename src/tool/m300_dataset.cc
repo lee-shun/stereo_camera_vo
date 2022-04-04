@@ -59,6 +59,20 @@ bool M300Dataset::Init() {
       right_t.norm(), Sophus::SE3d(Sophus::SO3d(), right_t));
   cameras_.push_back(right_cam);
 
+  PRINT_DEBUG("left camera fx: %.8f", left_K(0, 0));
+  PRINT_DEBUG("left camera fy: %.8f", left_K(1, 1));
+  PRINT_DEBUG("left camera cx: %.8f", left_K(0, 2));
+  PRINT_DEBUG("left camera cy: %.8f", left_K(1, 2));
+  PRINT_DEBUG("left camera baseline: %.8f", left_t.norm());
+  PRINT_DEBUG("left camera baseline*fx: %.8f", left_t.norm() * left_K(0, 0));
+
+  PRINT_DEBUG("right camera fx: %.8f", right_K(0, 0));
+  PRINT_DEBUG("right camera fy: %.8f", right_K(1, 1));
+  PRINT_DEBUG("right camera cx: %.8f", right_K(0, 2));
+  PRINT_DEBUG("right camera cy: %.8f", right_K(1, 2));
+  PRINT_DEBUG("right camera baseline: %.8f", right_t.norm());
+  PRINT_DEBUG("right camera baseline*fx: %.8f", right_t.norm() * right_K(0, 0));
+
   return true;
 }
 
