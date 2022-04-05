@@ -156,9 +156,13 @@ void LocalBA::Optimize(common::Map::KeyframesType &keyframes,
       }
 
       edge->setId(obs_index);
+
       auto frame = feat->frame_.lock();
+      if (veretx_pose_set.find(frame->keyframe_id_) == veretx_pose_set.end())
+        continue;
       edge->setVertex(0, veretx_pose_set.at(frame->keyframe_id_));  // pose
-      edge->setVertex(1, vertex_ldmk_set.at(landmark_id));          // landmark
+
+      edge->setVertex(1, vertex_ldmk_set.at(landmark_id));  // landmark
       edge->setMeasurement(tool::ToVec2(feat->position_.pt));
       edge->setInformation(Eigen::Matrix2d::Identity());
       auto rk = new g2o::RobustKernelHuber();
