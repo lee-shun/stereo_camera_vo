@@ -101,9 +101,9 @@ cv::Mat Viewer::PlotFrameImage() {
   cv::Mat img_out;
   cv::cvtColor(current_frame_->left_img_, img_out, cv::COLOR_GRAY2BGR);
 
-  for (size_t i = 0; i < current_frame_->features_left_.size(); ++i) {
-    if (current_frame_->features_left_[i]->map_point_.lock()) {
-      auto feat = current_frame_->features_left_[i];
+  for (size_t i = 0; i < current_frame_->GetFeaturesLeft().size(); ++i) {
+    if (current_frame_->GetFeaturesLeft()[i]->map_point_.lock()) {
+      auto feat = current_frame_->GetFeaturesLeft()[i];
       cv::circle(img_out, feat->position_.pt, 2, cv::Scalar(0, 250, 0), 2);
     }
   }

@@ -48,7 +48,6 @@ void Map::InsertMapPoint(MapPoint::Ptr map_point) {
 }
 
 void Map::RemoveOldKeyframe(KeyframesType& keyframes) {
-  std::unique_lock<std::mutex> lck(data_mutex_);
   if (current_frame_ == nullptr) return;
 
   // find out the nearest and farest keyframe, use the distance
@@ -83,13 +82,13 @@ void Map::RemoveOldKeyframe(KeyframesType& keyframes) {
   keyframes.erase(frame_to_remove->keyframe_id_);
 
   // landmark observation (features)
-  for (auto feat : frame_to_remove->features_left_) {
+  for (auto feat : frame_to_remove->GetFeaturesLeft()) {
     auto map_point = feat->map_point_.lock();
     if (map_point) {
       map_point->RemoveObservation(feat);
     }
   }
-  for (auto feat : frame_to_remove->features_right_) {
+  for (auto feat : frame_to_remove->GetFeaturesRight()) {
     if (feat == nullptr) continue;
     auto map_point = feat->map_point_.lock();
     if (map_point) {
@@ -99,7 +98,6 @@ void Map::RemoveOldKeyframe(KeyframesType& keyframes) {
 }
 
 void Map::CleanLandmarks(LandmarksType& landmarks) {
-  std::unique_lock<std::mutex> lck(data_mutex_);
   int cnt_landmark_removed = 0;
   for (auto iter = landmarks.begin(); iter != landmarks.end();) {
     if (iter->second->observed_times_ == 0) {
