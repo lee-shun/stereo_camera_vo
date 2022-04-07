@@ -148,20 +148,18 @@ void LocalBA::Optimize(common::Map::KeyframesType &keyframes,
       auto feat = obs.lock();
       if (feat->is_outlier_ || feat->frame_.lock() == nullptr) continue;
 
+      auto frame = feat->frame_.lock();
+      if (veretx_pose_set.find(frame->keyframe_id_) == veretx_pose_set.end())
+        continue;
+
       EdgeProjection *edge = nullptr;
       if (feat->is_on_left_image_) {
         edge = new EdgeProjection(K, left_ext);
       } else {
         edge = new EdgeProjection(K, right_ext);
       }
-
       edge->setId(obs_index);
-
-      auto frame = feat->frame_.lock();
-      if (veretx_pose_set.find(frame->keyframe_id_) == veretx_pose_set.end())
-        continue;
       edge->setVertex(0, veretx_pose_set.at(frame->keyframe_id_));  // pose
-
       edge->setVertex(1, vertex_ldmk_set.at(landmark_id));  // landmark
       edge->setMeasurement(tool::ToVec2(feat->position_.pt));
       edge->setInformation(Eigen::Matrix2d::Identity());
@@ -184,7 +182,8 @@ void LocalBA::Optimize(common::Map::KeyframesType &keyframes,
     if (ef.first->chi2() > chi2_th) {
       ef.second->is_outlier_ = true;
       // remove the observation
-      ef.second->map_point_.lock()->RemoveObservation(ef.second);
+      if (nullptr != ef.second->map_point_.lock())
+        ef.second->map_point_.lock()->RemoveObservation(ef.second);
     } else {
       ef.second->is_outlier_ = false;
     }

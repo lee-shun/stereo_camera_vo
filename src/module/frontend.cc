@@ -224,9 +224,11 @@ int Frontend::EstimateCurrentPose() {
   // Set pose and outlier
   current_frame_->SetPose(vertex_pose->estimate());
   for (auto &feat : features) {
-    if (feat->is_outlier_) {
-      feat->map_point_.reset();
-      feat->is_outlier_ = false;  // maybe we can still use it in future
+    if (feat) {
+      if (feat->is_outlier_) {
+        feat->map_point_.reset();
+        feat->is_outlier_ = false;  // maybe we can still use it in future
+      }
     }
   }
 
