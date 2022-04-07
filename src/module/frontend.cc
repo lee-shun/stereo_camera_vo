@@ -105,7 +105,6 @@ bool Frontend::Track() {
   return true;
 }
 
-// TODO(lee-shun): here!
 int Frontend::TrackLastFrame() {
   // calculate the initial guess
   std::vector<cv::Point2f> kps_last, kps_current;
@@ -147,6 +146,7 @@ int Frontend::TrackLastFrame() {
   return num_good_pts;
 }
 
+// it is current pose
 int Frontend::EstimateCurrentPose() {
   // setup g2o
   typedef g2o::BlockSolver_6_3 BlockSolverType;
