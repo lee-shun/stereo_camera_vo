@@ -47,13 +47,13 @@ struct Frame {
 
   // Note the pose is Tcw;
   Sophus::SE3d Pose() {
-    std::unique_lock<std::mutex> lck(pose_mutex_);
+    std::unique_lock<std::mutex> lck(data_mutex_);
     return pose_;
   }
 
   // Note the pose is Tcw;
   void SetPose(const Sophus::SE3d &pose) {
-    std::unique_lock<std::mutex> lck(pose_mutex_);
+    std::unique_lock<std::mutex> lck(data_mutex_);
     pose_ = pose;
   }
 
@@ -70,7 +70,7 @@ struct Frame {
 
   // Note the pose is Tcw;
   Sophus::SE3d pose_;
-  std::mutex pose_mutex_;
+  std::mutex data_mutex_;
 
   cv::Mat left_img_, right_img_;
 

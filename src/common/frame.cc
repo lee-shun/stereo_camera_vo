@@ -35,6 +35,7 @@ Frame::Ptr Frame::CreateFrame() {
 
 void Frame::SetKeyFrame() {
   static uint64_t keyframe_factory_id;
+  std::unique_lock<std::mutex> lck(data_mutex_);
   is_keyframe_ = true;
   keyframe_id_ = keyframe_factory_id++;
 }

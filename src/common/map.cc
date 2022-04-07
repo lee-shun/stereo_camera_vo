@@ -20,6 +20,7 @@
 namespace stereo_camera_vo {
 namespace common {
 void Map::InsertKeyFrame(Frame::Ptr frame) {
+  std::unique_lock<std::mutex> lck(data_mutex_);
   current_frame_ = frame;
   if (keyframes_.find(frame->keyframe_id_) == keyframes_.end()) {
     keyframes_.insert(make_pair(frame->keyframe_id_, frame));
@@ -36,6 +37,7 @@ void Map::InsertKeyFrame(Frame::Ptr frame) {
 }
 
 void Map::InsertMapPoint(MapPoint::Ptr map_point) {
+  std::unique_lock<std::mutex> lck(data_mutex_);
   if (landmarks_.find(map_point->id_) == landmarks_.end()) {
     landmarks_.insert(make_pair(map_point->id_, map_point));
     active_landmarks_.insert(make_pair(map_point->id_, map_point));
@@ -46,6 +48,7 @@ void Map::InsertMapPoint(MapPoint::Ptr map_point) {
 }
 
 void Map::RemoveOldKeyframe(KeyframesType& keyframes) {
+  std::unique_lock<std::mutex> lck(data_mutex_);
   if (current_frame_ == nullptr) return;
 
   // find out the nearest and farest keyframe, use the distance
@@ -96,6 +99,7 @@ void Map::RemoveOldKeyframe(KeyframesType& keyframes) {
 }
 
 void Map::CleanLandmarks(LandmarksType& landmarks) {
+  std::unique_lock<std::mutex> lck(data_mutex_);
   int cnt_landmark_removed = 0;
   for (auto iter = landmarks.begin(); iter != landmarks.end();) {
     if (iter->second->observed_times_ == 0) {
