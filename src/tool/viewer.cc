@@ -33,6 +33,7 @@ Viewer::Viewer() {
 }
 
 void Viewer::Stop() {
+  std::unique_lock<std::mutex> lck(viewer_data_mutex_);
   viewer_running_.store(false);
   PRINT_INFO("stop current viewer! wait for join!");
   viewer_thread_.join();

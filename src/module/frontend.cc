@@ -132,6 +132,8 @@ int Frontend::TrackLastFrame() {
 
   int num_good_pts = 0;
 
+  // after tracked with last, set the current features to map points. if not,
+  // leave it nullptr
   for (size_t i = 0; i < status.size(); ++i) {
     if (status[i]) {
       cv::KeyPoint kp(kps_current[i], 7);
@@ -172,7 +174,7 @@ int Frontend::EstimateCurrentPose() {
   std::vector<common::Feature::Ptr> cur_frame_features;
   for (size_t i = 0; i < current_frame_->GetFeaturesLeft().size(); ++i) {
     auto mp = current_frame_->GetFeaturesLeft()[i]->map_point_.lock();
-    if (mp) {
+    if (nullptr != mp) {
       cur_frame_features.push_back(current_frame_->GetFeaturesLeft()[i]);
       EdgeProjectionPoseOnly *edge = new EdgeProjectionPoseOnly(mp->pos_, K);
       edge->setId(index);
@@ -187,10 +189,13 @@ int Frontend::EstimateCurrentPose() {
     }
   }
 
+  PRINT_DEBUG("index: %d\n", index);
+
   // estimate the Pose the determine the outliers
   const double chi2_th = 5.991;
   int cnt_outlier = 0;
   for (int iteration = 0; iteration < 4; ++iteration) {
+    PRINT_DEBUG("iter: %d\n", iteration);
     vertex_pose->setEstimate(current_frame_->Pose());
     // setLevel(int) is useful when you call
     // optimizer.initializeOptimization(int). If you assign
@@ -222,13 +227,13 @@ int Frontend::EstimateCurrentPose() {
     }
   }
 
-  // Set pose and outlier
+  // if feature is outlier, remove its observations to map_point
   current_frame_->SetPose(vertex_pose->estimate());
   for (auto &feat : cur_frame_features) {
     if (feat) {
       if (feat->is_outlier_) {
         feat->map_point_.reset();
-        feat->is_outlier_ = false;  // maybe we can still use it in future
+        feat->is_outlier_ = false;
       }
     }
   }
@@ -238,6 +243,7 @@ int Frontend::EstimateCurrentPose() {
   return cur_frame_features.size() - cnt_outlier;
 }
 
+// important
 bool Frontend::UpdateMapWithFrame() {
   if (num_tracking_inliers_ >= param_.num_features_needed_for_keyframe_) {
     // still have enough features, don't have potential to be a keyframe.
@@ -417,13 +423,15 @@ bool Frontend::BuildInitMap() {
 
 bool Frontend::Reset() {
   PRINT_WARN("reset VO!");
+
   current_frame_ = nullptr;
   last_frame_ = nullptr;
   relative_motion_ = Sophus::SE3d();
-
   map_ = common::Map::Ptr(new common::Map);
 
+  local_BA_->Restart();
   local_BA_->SetMap(map_);
+  local_BA_->SetCameras(camera_left_, camera_right_);
 
   if (nullptr != viewer_) {
     viewer_->SetMap(map_);
