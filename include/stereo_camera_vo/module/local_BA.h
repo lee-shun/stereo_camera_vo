@@ -41,6 +41,8 @@ class LocalBA {
    * */
   LocalBA();
 
+  ~LocalBA() { Detach(); }
+
   void SetCameras(common::Camera::Ptr left, common::Camera::Ptr right) {
     cam_left_ = left;
     cam_right_ = right;
@@ -53,16 +55,17 @@ class LocalBA {
    * */
   void UpdateMap();
 
+  void Restart();
   void Detach();
 
   void Stop();
 
-
  private:
   void ThreadLoop();
 
-  void UpdateChiTh(const std::map<EdgeProjection*, common::Feature::Ptr>&
-                       edges_and_features, double* chi2_th);
+  void UpdateChiTh(
+      const std::map<EdgeProjection*, common::Feature::Ptr>& edges_and_features,
+      double* chi2_th);
 
   void Optimize(common::Map::KeyframesType& keyframes,
                 common::Map::LandmarksType& landmarks);

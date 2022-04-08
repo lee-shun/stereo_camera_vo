@@ -20,6 +20,7 @@
 namespace stereo_camera_vo {
 namespace common {
 void Map::InsertKeyFrame(Frame::Ptr frame) {
+  std::unique_lock<std::mutex> lck(data_mutex_);
   current_frame_ = frame;
   if (keyframes_.find(frame->keyframe_id_) == keyframes_.end()) {
     keyframes_.insert(make_pair(frame->keyframe_id_, frame));
@@ -36,6 +37,7 @@ void Map::InsertKeyFrame(Frame::Ptr frame) {
 }
 
 void Map::InsertMapPoint(MapPoint::Ptr map_point) {
+  std::unique_lock<std::mutex> lck(data_mutex_);
   if (landmarks_.find(map_point->id_) == landmarks_.end()) {
     landmarks_.insert(make_pair(map_point->id_, map_point));
     active_landmarks_.insert(make_pair(map_point->id_, map_point));
@@ -80,13 +82,13 @@ void Map::RemoveOldKeyframe(KeyframesType& keyframes) {
   keyframes.erase(frame_to_remove->keyframe_id_);
 
   // landmark observation (features)
-  for (auto feat : frame_to_remove->features_left_) {
+  for (auto feat : frame_to_remove->GetFeaturesLeft()) {
     auto map_point = feat->map_point_.lock();
     if (map_point) {
       map_point->RemoveObservation(feat);
     }
   }
-  for (auto feat : frame_to_remove->features_right_) {
+  for (auto feat : frame_to_remove->GetFeaturesRight()) {
     if (feat == nullptr) continue;
     auto map_point = feat->map_point_.lock();
     if (map_point) {
