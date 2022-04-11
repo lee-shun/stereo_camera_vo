@@ -54,7 +54,7 @@ bool KittiDataset::Init() {
     Eigen::Vector3d t;
     t << projection_data[3], projection_data[7], projection_data[11];
     t = K.inverse() * t;
-    K = K * 0.5;
+    // K = K * 0.5;
 
     common::Camera::Ptr new_camera(
         new common::Camera(K(0, 0), K(1, 1), K(0, 2), K(1, 2), t.norm(),
@@ -89,8 +89,8 @@ bool KittiDataset::NextFrame(common::Frame::Ptr new_frame ) {
   cv::resize(image_right, image_right_resized, cv::Size(), 0.5, 0.5,
              cv::INTER_NEAREST);
 
-  new_frame->left_img_ = image_left_resized;
-  new_frame->right_img_ = image_right_resized;
+  new_frame->left_img_ = image_left;
+  new_frame->right_img_ = image_right;
   current_image_index_++;
 
   return true;

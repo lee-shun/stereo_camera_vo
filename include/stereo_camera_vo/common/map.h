@@ -18,6 +18,7 @@
 
 #include "stereo_camera_vo/common/frame.h"
 #include "stereo_camera_vo/common/map_point.h"
+#include "stereo_camera_vo/tool/print_ctrl_macro.h"
 
 #include <Eigen/Core>
 
@@ -35,6 +36,8 @@ class Map {
   typedef std::unordered_map<uint64_t, Frame::Ptr> KeyframesType;
 
   Map() {}
+
+  ~Map() { PRINT_INFO("old map destroyed!"); }
 
   void InsertKeyFrame(Frame::Ptr frame);
 
@@ -59,7 +62,6 @@ class Map {
     std::unique_lock<std::mutex> lck(data_mutex_);
     return active_keyframes_;
   }
-
 
  private:
   /**

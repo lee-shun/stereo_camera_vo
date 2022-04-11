@@ -28,8 +28,8 @@ namespace module {
 // TODO(lee-shun): this local BA has memory leak problems???
 
 LocalBA::LocalBA() {
-  local_BA_running_.store(true);
   local_BA_thread_ = std::thread(std::bind(&LocalBA::ThreadLoop, this));
+  local_BA_running_.store(true);
 }
 
 void LocalBA::UpdateMap() {
@@ -37,27 +37,35 @@ void LocalBA::UpdateMap() {
   map_update_.notify_one();
 }
 
-void LocalBA::Stop() {
-  local_BA_running_.store(false);
-  map_update_.notify_one();
+void LocalBA::Restart() {
+  Detach();
+  local_BA_running_.store(true);
+  local_BA_thread_ = std::thread(std::bind(&LocalBA::ThreadLoop, this));
+}
 
+void LocalBA::Stop() {
+  std::unique_lock<std::mutex> lock(data_mutex_);
   // release camera and map
   cam_left_ = nullptr;
   cam_right_ = nullptr;
   map_ = nullptr;
+
+  local_BA_running_.store(false);
+  map_update_.notify_one();
 
   PRINT_INFO("stop current local BA! wait for join!");
   local_BA_thread_.join();
 }
 
 void LocalBA::Detach() {
-  local_BA_running_.store(false);
-  map_update_.notify_one();
-
+  std::unique_lock<std::mutex> lock(data_mutex_);
   // release camera and map
   cam_left_ = nullptr;
   cam_right_ = nullptr;
   map_ = nullptr;
+
+  local_BA_running_.store(false);
+  map_update_.notify_one();
 
   PRINT_INFO("detach current local BA!");
   local_BA_thread_.detach();
@@ -146,7 +154,13 @@ void LocalBA::Optimize(common::Map::KeyframesType &keyframes,
     for (auto &obs : observations) {
       if (obs.lock() == nullptr) continue;
       auto feat = obs.lock();
-      if (feat->is_outlier_ || feat->frame_.lock() == nullptr) continue;
+      if (feat->is_outlier_ || feat->frame_.lock() == nullptr ||
+          feat->map_point_.lock() == nullptr)
+        continue;
+
+      auto frame = feat->frame_.lock();
+      if (veretx_pose_set.find(frame->keyframe_id_) == veretx_pose_set.end())
+        continue;
 
       EdgeProjection *edge = nullptr;
       if (feat->is_on_left_image_) {
@@ -154,9 +168,7 @@ void LocalBA::Optimize(common::Map::KeyframesType &keyframes,
       } else {
         edge = new EdgeProjection(K, right_ext);
       }
-
       edge->setId(obs_index);
-      auto frame = feat->frame_.lock();
       edge->setVertex(0, veretx_pose_set.at(frame->keyframe_id_));  // pose
       edge->setVertex(1, vertex_ldmk_set.at(landmark_id));          // landmark
       edge->setMeasurement(tool::ToVec2(feat->position_.pt));
@@ -170,6 +182,9 @@ void LocalBA::Optimize(common::Map::KeyframesType &keyframes,
     }
   }
 
+  // no edges!
+  if (obs_index == 1) return;
+
   // do optimization and eliminate the outliers
   optimizer.initializeOptimization();
   optimizer.optimize(10);
@@ -180,7 +195,8 @@ void LocalBA::Optimize(common::Map::KeyframesType &keyframes,
     if (ef.first->chi2() > chi2_th) {
       ef.second->is_outlier_ = true;
       // remove the observation
-      ef.second->map_point_.lock()->RemoveObservation(ef.second);
+      if (nullptr != ef.second->map_point_.lock())
+        ef.second->map_point_.lock()->RemoveObservation(ef.second);
     } else {
       ef.second->is_outlier_ = false;
     }

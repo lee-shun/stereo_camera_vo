@@ -47,13 +47,13 @@ struct Frame {
 
   // Note the pose is Tcw;
   Sophus::SE3d Pose() {
-    std::unique_lock<std::mutex> lck(pose_mutex_);
+    std::unique_lock<std::mutex> lck(data_mutex_);
     return pose_;
   }
 
   // Note the pose is Tcw;
   void SetPose(const Sophus::SE3d &pose) {
-    std::unique_lock<std::mutex> lck(pose_mutex_);
+    std::unique_lock<std::mutex> lck(data_mutex_);
     pose_ = pose;
   }
 
@@ -70,10 +70,21 @@ struct Frame {
 
   // Note the pose is Tcw;
   Sophus::SE3d pose_;
-  std::mutex pose_mutex_;
+  std::mutex data_mutex_;
 
   cv::Mat left_img_, right_img_;
 
+ public:
+  std::vector<std::shared_ptr<Feature>>& GetFeaturesLeft() {
+    std::unique_lock<std::mutex> lck(data_mutex_);
+    return features_left_;
+  }
+  std::vector<std::shared_ptr<Feature>>& GetFeaturesRight() {
+    std::unique_lock<std::mutex> lck(data_mutex_);
+    return features_right_;
+  }
+
+ private:
   // extracted features in left image
   std::vector<std::shared_ptr<Feature>> features_left_;
   // corresponding features in right image, set to nullptr if no corresponding
