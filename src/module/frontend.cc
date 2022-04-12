@@ -126,7 +126,7 @@ int Frontend::TrackLastFrame() {
   cv::Mat error;
   cv::calcOpticalFlowPyrLK(
       last_frame_->left_img_, current_frame_->left_img_, kps_last, kps_current,
-      status, error, cv::Size(11, 11), 3,
+      status, error, cv::Size(31, 31), 3,
       cv::TermCriteria(cv::TermCriteria::COUNT + cv::TermCriteria::EPS, 30,
                        0.01),
       cv::OPTFLOW_USE_INITIAL_FLOW);
@@ -442,5 +442,7 @@ bool Frontend::Reset() {
   status_ = FrontendStatus::INITING;
   return true;
 }
+
+bool Frontend::Relocalization() {}
 }  // namespace module
 }  // namespace stereo_camera_vo

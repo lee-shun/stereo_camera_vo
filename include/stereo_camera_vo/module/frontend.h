@@ -74,6 +74,12 @@ class Frontend {
   bool Reset();
 
   /**
+   * Reset when lost
+   * @return true if success
+   */
+  bool Relocalization();
+
+  /**
    * Track with last frame, get the keypoints in current frame.
    * use LK flow to estimate points in the current image
    * @return num of tracked points

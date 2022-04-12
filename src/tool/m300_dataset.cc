@@ -97,8 +97,8 @@ bool M300Dataset::NextFrame(common::Frame::Ptr new_frame) {
     return false;
   }
 
-  // image_left = tool::AddContrastness(image_left);
-  // image_right = tool::AddContrastness(image_right);
+  tool::GammaTransform(image_left);
+  tool::GammaTransform(image_right);
 
   new_frame->left_img_ = image_left;
   new_frame->right_img_ = image_right;

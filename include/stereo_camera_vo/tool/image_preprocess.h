@@ -22,7 +22,10 @@ namespace stereo_camera_vo {
 namespace tool {
 
 cv::Mat AddContrastness(cv::Mat gray);
-}
+
+void GammaTransform(cv::Mat &gary);
+
+}  // namespace tool
 }  // namespace stereo_camera_vo
 
 #endif  // INCLUDE_STEREO_CAMERA_VO_TOOL_IMAGE_PREPROCESS_H_
