@@ -92,6 +92,7 @@ bool Frontend::Track() {
   } else if (num_tracking_inliers_ > param_.num_features_tracking_bad_) {
     status_ = FrontendStatus::TRACKING_BAD;
   } else {
+    PRINT_WARN("track lost with features: %d", num_tracking_inliers_);
     status_ = FrontendStatus::LOST;
   }
 
@@ -192,10 +193,9 @@ int Frontend::EstimateCurrentPose() {
   PRINT_DEBUG("index: %d\n", index);
 
   // estimate the Pose the determine the outliers
-  const double chi2_th = 5.991;
+  const double chi2_th = 5.95;
   int cnt_outlier = 0;
   for (int iteration = 0; iteration < 4; ++iteration) {
-    PRINT_DEBUG("iter: %d\n", iteration);
     vertex_pose->setEstimate(current_frame_->Pose());
     // setLevel(int) is useful when you call
     // optimizer.initializeOptimization(int). If you assign
@@ -238,7 +238,7 @@ int Frontend::EstimateCurrentPose() {
     }
   }
 
-  PRINT_INFO("outlier/Inlier in pose estimating: %d/%lu", cnt_outlier,
+  PRINT_INFO("outlier/inlier in pose estimating: %d/%lu", cnt_outlier,
              cur_frame_features.size() - cnt_outlier);
   return cur_frame_features.size() - cnt_outlier;
 }

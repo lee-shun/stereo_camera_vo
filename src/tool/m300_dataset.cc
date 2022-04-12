@@ -14,6 +14,7 @@
  *******************************************************************************/
 
 #include "stereo_camera_vo/tool/m300_dataset.h"
+#include "stereo_camera_vo/tool/image_preprocess.h"
 #include "stereo_camera_vo/tool/print_ctrl_macro.h"
 #include "stereo_camera_vo/tool/system_lib.h"
 
@@ -95,6 +96,9 @@ bool M300Dataset::NextFrame(common::Frame::Ptr new_frame) {
     PRINT_WARN("can not find images at index %d", current_image_index_);
     return false;
   }
+
+  // image_left = tool::AddContrastness(image_left);
+  // image_right = tool::AddContrastness(image_right);
 
   new_frame->left_img_ = image_left;
   new_frame->right_img_ = image_right;

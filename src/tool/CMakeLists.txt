@@ -6,6 +6,7 @@ add_library(
   kitti_dataset.cc
   m300_dataset.cc
   algorithm.cc
+  image_preprocess.cc
 )
 target_link_libraries(
   ${PROJECT_NAME}_tool
