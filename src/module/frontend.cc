@@ -35,7 +35,7 @@ Frontend::Frontend(common::Camera::Ptr left, common::Camera::Ptr right,
   /**
    * init submodules, all smart pointers
    * */
-  cv_detector_ = cv::GFTTDetector::create(param_.num_features_, 0.01, 10);
+  cv_detector_ = cv::GFTTDetector::create(param_.num_features_, 0.002, 10);
 
   map_ = common::Map::Ptr(new common::Map);
 
