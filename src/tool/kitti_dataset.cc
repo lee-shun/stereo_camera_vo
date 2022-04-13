@@ -28,7 +28,7 @@ namespace stereo_camera_vo {
 namespace tool {
 
 KittiDataset::KittiDataset(const std::string& dataset_path)
-    : DatasetBase(dataset_path) {}
+    : DatasetBase(dataset_path, 0) {}
 
 bool KittiDataset::Init() {
   std::ifstream fin(dataset_path_ + "/calib.txt");
@@ -67,7 +67,7 @@ bool KittiDataset::Init() {
   return true;
 }
 
-bool KittiDataset::NextFrame(common::Frame::Ptr new_frame ) {
+bool KittiDataset::NextFrame(common::Frame::Ptr new_frame) {
   boost::format fmt("%s/image_%d/%06d.png");
   cv::Mat image_left, image_right;
   // read images

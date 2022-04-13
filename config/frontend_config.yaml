@@ -2,4 +2,4 @@ num_features: 200
 num_features_init: 50
 num_features_tracking: 50
 num_features_tracking_bad: 20
-num_features_needed_for_keyframe: 80
+num_features_needed_for_keyframe: 100

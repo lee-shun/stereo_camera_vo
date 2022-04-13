@@ -28,8 +28,12 @@ int main(int argc, char **argv) {
   const std::string dataset_path =
       stereo_camera_vo::tool::GetParam<std::string>(node, "dataset_path", "");
 
+  const int start_from_index =
+      stereo_camera_vo::tool::GetParam<int>(node, "start_from_index", 1);
+
   stereo_camera_vo::tool::DatasetBase::Ptr dataset =
-      std::make_shared<stereo_camera_vo::tool::M300Dataset>(dataset_path);
+      std::make_shared<stereo_camera_vo::tool::M300Dataset>(dataset_path,
+                                                            start_from_index);
 
   stereo_camera_vo::app::VisualOdometry::Ptr vo(
       new stereo_camera_vo::app::VisualOdometry(config_file, dataset));

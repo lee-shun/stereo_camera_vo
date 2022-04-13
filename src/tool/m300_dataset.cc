@@ -81,7 +81,6 @@ bool M300Dataset::NextFrame(common::Frame::Ptr new_frame) {
   boost::format fmt("%s/image_%d/%d.png");
   cv::Mat image_left, image_right;
 
-  current_image_index_++;
   PRINT_DEBUG(" current_image_index_: %d", current_image_index_);
 
   // read images
@@ -115,10 +114,11 @@ bool M300Dataset::NextFrame(common::Frame::Ptr new_frame) {
   Sophus::SE3d pose_body_Twb(att_body, Eigen::Vector3d::Zero());
   Sophus::SE3d pose_cam_Tcw = Twb2Twc(pose_body_Twb).inverse();
 
-  if (0 == current_image_index_ - 1) {
+  if (first_frame) {
     first_frame_pose_Tcw_ = pose_cam_Tcw;
     std::cout << "First frame absolute pose Tcw:\n"
               << first_frame_pose_Tcw_.matrix() << std::endl;
+    first_frame = false;
   }
 
   // get current frame pose (it is actually relative motion according to the
@@ -128,6 +128,8 @@ bool M300Dataset::NextFrame(common::Frame::Ptr new_frame) {
 
   new_frame->use_init_pose_ = true;
   new_frame->SetPose(realtive_pose_Tcw);
+
+  ++current_image_index_;
 
   return true;
 }
@@ -158,7 +160,8 @@ Sophus::SE3d M300Dataset::Twb2Twc(const Sophus::SE3d& Twb) const {
 }
 
 bool M300Dataset::GetAttByIndex(const std::string pose_path,
-                                const int pose_index, Eigen::Quaterniond* att) {
+                                const uint16_t pose_index,
+                                Eigen::Quaterniond* att) {
   std::ifstream pose_fin_;
   pose_fin_.open(pose_path);
   if (!pose_fin_) {

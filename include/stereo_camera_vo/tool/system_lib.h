@@ -41,7 +41,7 @@ T GetParam(const YAML::Node& node, const std::string& var_key,
 /**
  * locate the file to the line number
  * */
-inline std::ifstream& SeekToLine(std::ifstream& in, const int line_nbr) {
+inline std::ifstream& SeekToLine(std::ifstream& in, const uint16_t line_nbr) {
   int i;
   char buf[1024];
   // locate to begin of the file
