@@ -61,8 +61,13 @@ bool Frontend::AddFrame(common::Frame::Ptr frame) {
       Track();
       break;
     case FrontendStatus::LOST:
-      Reset();
+      // Reset();
+      Relocalization();
       break;
+  }
+
+  if (status_ == FrontendStatus::LOST) {
+    return false;
   }
 
   last_frame_ = current_frame_;
@@ -71,10 +76,10 @@ bool Frontend::AddFrame(common::Frame::Ptr frame) {
 
 bool Frontend::Track() {
   // TODO: use the outside rotatoion
+  Sophus::SE3d current_pose;
   if (nullptr != last_frame_) {
     Sophus::SE3d current_estimate = relative_motion_ * last_frame_->Pose();
 
-    Sophus::SE3d current_pose;
     if (current_frame_->use_init_pose_) {
       current_pose = Sophus::SE3d(current_frame_->Pose().rotationMatrix(),
                                   current_estimate.translation());
@@ -96,13 +101,17 @@ bool Frontend::Track() {
     status_ = FrontendStatus::LOST;
   }
 
-  UpdateMapWithFrame();
+  if (status_ == FrontendStatus::LOST) {
+    current_frame_->SetPose(current_pose);
+    return false;
+  }
 
+  UpdateMapWithFrame();
   if (nullptr != viewer_) {
     viewer_->AddCurrentFrame(current_frame_);
   }
-
   relative_motion_ = current_frame_->Pose() * last_frame_->Pose().inverse();
+
   return true;
 }
 
@@ -443,6 +452,10 @@ bool Frontend::Reset() {
   return true;
 }
 
-bool Frontend::Relocalization() {}
+bool Frontend::Relocalization() {
+  PRINT_WARN("Relocalization!");
+  current_frame_->SetPose(last_frame_->Pose());
+  return StereoInit();
+}
 }  // namespace module
 }  // namespace stereo_camera_vo
