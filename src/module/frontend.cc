@@ -35,7 +35,7 @@ Frontend::Frontend(common::Camera::Ptr left, common::Camera::Ptr right,
   /**
    * init submodules, all smart pointers
    * */
-  cv_detector_ = cv::GFTTDetector::create(param_.num_features_, 0.002, 10);
+  cv_detector_ = cv::GFTTDetector::create(param_.num_features_, 0.001, 30);
 
   map_ = common::Map::Ptr(new common::Map);
 
@@ -126,7 +126,7 @@ int Frontend::TrackLastFrame() {
   cv::Mat error;
   cv::calcOpticalFlowPyrLK(
       last_frame_->left_img_, current_frame_->left_img_, kps_last, kps_current,
-      status, error, cv::Size(11, 11), 3,
+      status, error, cv::Size(21, 21), 3,
       cv::TermCriteria(cv::TermCriteria::COUNT + cv::TermCriteria::EPS, 30,
                        0.01),
       cv::OPTFLOW_USE_INITIAL_FLOW);
@@ -386,7 +386,7 @@ int Frontend::FindFeaturesInRight() {
   cv::Mat error;
   cv::calcOpticalFlowPyrLK(
       current_frame_->left_img_, current_frame_->right_img_, kps_left,
-      kps_right, status, error, cv::Size(11, 11), 3,
+      kps_right, status, error, cv::Size(21, 21), 3,
       cv::TermCriteria(cv::TermCriteria::COUNT + cv::TermCriteria::EPS, 30,
                        0.01),
       cv::OPTFLOW_USE_INITIAL_FLOW);
