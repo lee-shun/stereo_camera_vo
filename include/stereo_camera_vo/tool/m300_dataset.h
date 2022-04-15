@@ -27,17 +27,19 @@ namespace stereo_camera_vo {
 namespace tool {
 class M300Dataset : public DatasetBase {
  public:
-  explicit M300Dataset(const std::string dataset_path)
-      : DatasetBase(dataset_path) {}
+  explicit M300Dataset(const std::string dataset_path,
+                       const uint16_t start_from = 1)
+      : DatasetBase(dataset_path, start_from) {}
 
   bool Init() override;
 
   bool NextFrame(common::Frame::Ptr new_frame) override;
 
-  static bool GetAttByIndex(const std::string pose_path, const int pose_index,
-                            Eigen::Quaterniond* att);
+  static bool GetAttByIndex(const std::string pose_path,
+                            const uint16_t pose_index, Eigen::Quaterniond* att);
 
  private:
+  bool first_frame{true};
   // read the camera data
   cv::FileStorage camera_config_file_;
 

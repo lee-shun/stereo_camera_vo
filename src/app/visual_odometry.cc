@@ -55,9 +55,7 @@ VisualOdometry::VisualOdometry(std::string frontend_config_path,
 void VisualOdometry::Run(const uint64_t msleep) {
   while (1) {
     PRINT_INFO("VO is running!");
-    if (Step() == false) {
-      break;
-    }
+    Step();
     std::this_thread::sleep_for(std::chrono::milliseconds(msleep));
   }
   frontend_->Stop();

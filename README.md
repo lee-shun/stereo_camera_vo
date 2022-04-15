@@ -11,6 +11,10 @@
 
 ## <p align="center">![run_m300](https://github.com/lee-shun/big_files/blob/master/images/stereo_camera_vo_images/cut.gif)</p>
 
+- Mapping with [octomap](https://octomap.github.io).
+
+## <p align="center">![mapping](https://github.com/lee-shun/big_files/blob/master/images/stereo_camera_vo_images/mapping.gif)</p>
+
 **NOTE:**
 
 - Green frame indicates current camera pose, while the red and black point clouds are the active and inactive landmarks

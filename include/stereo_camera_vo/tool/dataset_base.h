@@ -32,24 +32,25 @@ class DatasetBase {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   typedef std::shared_ptr<DatasetBase> Ptr;
 
-  explicit DatasetBase(const std::string dataset_path)
-      : dataset_path_(dataset_path) {}
+  explicit DatasetBase(const std::string dataset_path,
+                       const uint16_t start_from_index)
+      : dataset_path_(dataset_path), current_image_index_(start_from_index) {}
 
   virtual ~DatasetBase() {}
 
   virtual bool Init() = 0;
 
-  virtual  bool NextFrame(common::Frame::Ptr new_frame) = 0;
+  virtual bool NextFrame(common::Frame::Ptr new_frame) = 0;
 
   common::Camera::Ptr GetCamera(const int camera_id) const {
     return cameras_.at(camera_id);
   }
 
-  int GetIndex() const { return current_image_index_; }
+  uint16_t GetIndex() const { return current_image_index_; }
 
  protected:
   std::string dataset_path_;
-  int current_image_index_{0};
+  uint16_t current_image_index_{0};
 
   std::vector<common::Camera::Ptr> cameras_;
 };

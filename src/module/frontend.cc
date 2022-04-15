@@ -35,7 +35,7 @@ Frontend::Frontend(common::Camera::Ptr left, common::Camera::Ptr right,
   /**
    * init submodules, all smart pointers
    * */
-  cv_detector_ = cv::GFTTDetector::create(param_.num_features_, 0.01, 10);
+  cv_detector_ = cv::GFTTDetector::create(param_.num_features_, 0.001, 30);
 
   map_ = common::Map::Ptr(new common::Map);
 
@@ -53,9 +53,14 @@ bool Frontend::AddFrame(common::Frame::Ptr frame) {
   current_frame_ = frame;
 
   switch (status_) {
-    case FrontendStatus::INITING:
+    case FrontendStatus::INITING: {
+      Sophus::SE3d current_pose =
+          Sophus::SE3d(current_frame_->Pose().rotationMatrix(),
+                       last_success_pose.translation());
+      current_frame_->SetPose(current_pose);
       StereoInit();
       break;
+    }
     case FrontendStatus::TRACKING_GOOD:
     case FrontendStatus::TRACKING_BAD:
       Track();
@@ -66,15 +71,19 @@ bool Frontend::AddFrame(common::Frame::Ptr frame) {
   }
 
   last_frame_ = current_frame_;
+
+  if (status_ == FrontendStatus::LOST) {
+    return false;
+  }
   return true;
 }
 
 bool Frontend::Track() {
   // TODO: use the outside rotatoion
+  Sophus::SE3d current_pose;
   if (nullptr != last_frame_) {
     Sophus::SE3d current_estimate = relative_motion_ * last_frame_->Pose();
 
-    Sophus::SE3d current_pose;
     if (current_frame_->use_init_pose_) {
       current_pose = Sophus::SE3d(current_frame_->Pose().rotationMatrix(),
                                   current_estimate.translation());
@@ -92,16 +101,22 @@ bool Frontend::Track() {
   } else if (num_tracking_inliers_ > param_.num_features_tracking_bad_) {
     status_ = FrontendStatus::TRACKING_BAD;
   } else {
+    PRINT_WARN("track lost with features: %d", num_tracking_inliers_);
     status_ = FrontendStatus::LOST;
   }
 
-  UpdateMapWithFrame();
+  if (status_ == FrontendStatus::LOST) {
+    return false;
+  }
 
+  UpdateMapWithFrame();
   if (nullptr != viewer_) {
     viewer_->AddCurrentFrame(current_frame_);
   }
 
+  last_success_pose = current_frame_->Pose();
   relative_motion_ = current_frame_->Pose() * last_frame_->Pose().inverse();
+
   return true;
 }
 
@@ -125,7 +140,7 @@ int Frontend::TrackLastFrame() {
   cv::Mat error;
   cv::calcOpticalFlowPyrLK(
       last_frame_->left_img_, current_frame_->left_img_, kps_last, kps_current,
-      status, error, cv::Size(11, 11), 3,
+      status, error, cv::Size(21, 21), 3,
       cv::TermCriteria(cv::TermCriteria::COUNT + cv::TermCriteria::EPS, 30,
                        0.01),
       cv::OPTFLOW_USE_INITIAL_FLOW);
@@ -192,10 +207,9 @@ int Frontend::EstimateCurrentPose() {
   PRINT_DEBUG("index: %d\n", index);
 
   // estimate the Pose the determine the outliers
-  const double chi2_th = 5.991;
+  const double chi2_th = 5.95;
   int cnt_outlier = 0;
   for (int iteration = 0; iteration < 4; ++iteration) {
-    PRINT_DEBUG("iter: %d\n", iteration);
     vertex_pose->setEstimate(current_frame_->Pose());
     // setLevel(int) is useful when you call
     // optimizer.initializeOptimization(int). If you assign
@@ -238,7 +252,7 @@ int Frontend::EstimateCurrentPose() {
     }
   }
 
-  PRINT_INFO("outlier/Inlier in pose estimating: %d/%lu", cnt_outlier,
+  PRINT_INFO("outlier/inlier in pose estimating: %d/%lu", cnt_outlier,
              cur_frame_features.size() - cnt_outlier);
   return cur_frame_features.size() - cnt_outlier;
 }
@@ -386,7 +400,7 @@ int Frontend::FindFeaturesInRight() {
   cv::Mat error;
   cv::calcOpticalFlowPyrLK(
       current_frame_->left_img_, current_frame_->right_img_, kps_left,
-      kps_right, status, error, cv::Size(11, 11), 3,
+      kps_right, status, error, cv::Size(21, 21), 3,
       cv::TermCriteria(cv::TermCriteria::COUNT + cv::TermCriteria::EPS, 30,
                        0.01),
       cv::OPTFLOW_USE_INITIAL_FLOW);
@@ -442,5 +456,6 @@ bool Frontend::Reset() {
   status_ = FrontendStatus::INITING;
   return true;
 }
+
 }  // namespace module
 }  // namespace stereo_camera_vo
