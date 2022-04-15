@@ -74,12 +74,6 @@ class Frontend {
   bool Reset();
 
   /**
-   * Reset when lost
-   * @return true if success
-   */
-  bool Relocalization();
-
-  /**
    * Track with last frame, get the keypoints in current frame.
    * use LK flow to estimate points in the current image
    * @return num of tracked points
@@ -147,6 +141,7 @@ class Frontend {
   std::shared_ptr<tool::Viewer> viewer_{nullptr};
 
   Sophus::SE3d relative_motion_;
+  Sophus::SE3d last_success_pose;
 
   uint16_t num_tracking_inliers_{0};  // inliers, used for testing new keyframes
 

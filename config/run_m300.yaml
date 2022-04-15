@@ -1,5 +1,5 @@
 msleep_time: 0
 # dataset_path: /media/ls/WORK/slam_m300/m300_data_1
-start_from_index: 6000
+start_from_index: 12000
 dataset_path: /home/ls/m300_data
 config_file: ./config/frontend_config.yaml

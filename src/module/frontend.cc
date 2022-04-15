@@ -53,24 +53,28 @@ bool Frontend::AddFrame(common::Frame::Ptr frame) {
   current_frame_ = frame;
 
   switch (status_) {
-    case FrontendStatus::INITING:
+    case FrontendStatus::INITING: {
+      Sophus::SE3d current_pose =
+          Sophus::SE3d(current_frame_->Pose().rotationMatrix(),
+                       last_success_pose.translation());
+      current_frame_->SetPose(current_pose);
       StereoInit();
       break;
+    }
     case FrontendStatus::TRACKING_GOOD:
     case FrontendStatus::TRACKING_BAD:
       Track();
       break;
     case FrontendStatus::LOST:
-      // Reset();
-      Relocalization();
+      Reset();
       break;
   }
+
+  last_frame_ = current_frame_;
 
   if (status_ == FrontendStatus::LOST) {
     return false;
   }
-
-  last_frame_ = current_frame_;
   return true;
 }
 
@@ -102,7 +106,6 @@ bool Frontend::Track() {
   }
 
   if (status_ == FrontendStatus::LOST) {
-    current_frame_->SetPose(current_pose);
     return false;
   }
 
@@ -110,6 +113,8 @@ bool Frontend::Track() {
   if (nullptr != viewer_) {
     viewer_->AddCurrentFrame(current_frame_);
   }
+
+  last_success_pose = current_frame_->Pose();
   relative_motion_ = current_frame_->Pose() * last_frame_->Pose().inverse();
 
   return true;
@@ -452,10 +457,5 @@ bool Frontend::Reset() {
   return true;
 }
 
-bool Frontend::Relocalization() {
-  PRINT_WARN("Relocalization!");
-  current_frame_->SetPose(last_frame_->Pose());
-  return StereoInit();
-}
 }  // namespace module
 }  // namespace stereo_camera_vo
